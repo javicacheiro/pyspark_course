@@ -1,6 +1,5 @@
 from __future__ import print_function
-from pyspark import SparkContext
-from pyspark.sql import Row, HiveContext
+from pyspark.sql import SparkSession, Row
 
 
 def parse_row(line):
@@ -17,8 +16,17 @@ def parse_row(line):
 
 
 if __name__ == '__main__':
-    sc = SparkContext(appName='Meteo analysis')
-    sqlContext = HiveContext(sc)
+    spark = SparkSession\
+        .builder \
+        .appName("Meteo-using-DF") \
+        .config('spark.driver.memory', '2g') \
+        .config('spark.executor.cores', 1) \
+        .config('spark.executor.memory', '2g') \
+        .config('spark.executor.memoryOverhead', '1g') \
+        .config('spark.dynamicAllocation.enabled', False) \
+        .getOrCreate()
+    sc = spark.sparkContext
+
     rdd = sc.textFile('datasets/meteogalicia.txt')
     data = rdd.flatMap(parse_row).toDF()
     count = data.count()
@@ -30,4 +38,5 @@ if __name__ == '__main__':
     t.where(t.codigo == 1).groupBy().min('valor').show()
     print('Average temperatures per day')
     t.groupBy(t.data).mean('valor').sort('data').show(30)
-    sc.stop()
+
+    spark.stop()
