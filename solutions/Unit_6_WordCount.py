@@ -18,6 +18,6 @@ if __name__ == '__main__':
     counts = words.map(lambda word: (word, 1))
     aggregated = counts.reduceByKey(lambda a, b: a + b)
     result = aggregated.map(lambda (x, y): (y, x))
-    result.sortByKey(ascending=False).take(10)
+    print(result.sortByKey(ascending=False).take(10))
 
     spark.stop()
