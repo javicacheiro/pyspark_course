@@ -10,7 +10,7 @@ Data must be in text format (utf8 encoded).
 You can create the listening TCP socket using netcat:
 
     nc -l -k <port>
-    
+
 where <port> is the port where you want netcat to listen.
 
 ## Usage
@@ -31,8 +31,8 @@ def parse_args():
         print(f"Usage: {sys.argv[0]} <hostname> <port>")
         sys.exit(1)
     return (sys.argv[1], int(sys.argv[2]))
-    
-    
+
+
 if __name__ == "__main__":
     host, port = parse_args()
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         .appName("StreamingWordCount") \
         .config('spark.dynamicAllocation.enabled', False) \
         .getOrCreate()
-    
+
     # Each input line read from the stream is mapped to a row in the DataFrame
     # and the text is included inside a column named `value`
     lines = spark.readStream \
@@ -49,8 +49,6 @@ if __name__ == "__main__":
         .option('port', port) \
         .load()
 
-    lines.printSchema()
-    
     # Compute word counts
     words = lines.select(
         # explode turns each item in an array into a separate row
@@ -63,8 +61,8 @@ if __name__ == "__main__":
 
     # Start running the query
     query = wordCounts.writeStream \
-        .format('console') \    
-        .outputMode('complete') \        
+        .format('console') \
+        .outputMode('complete') \
         .option('checkpointLocation', 'wordcount-chk') \
         .start()
 

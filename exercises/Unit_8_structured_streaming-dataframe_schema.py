@@ -1,5 +1,5 @@
 """
-Reads streaming data from the given TCP socket and 
+Reads streaming data from the given TCP socket and
 prints the schema of the dataframe generated.
 
 ## Creating the TCP server
@@ -7,7 +7,7 @@ prints the schema of the dataframe generated.
 You can create the listening TCP socket using netcat:
 
     nc -l -k <port>
-    
+
 where <port> is the port where you want netcat to listen.
 
 ## Usage
@@ -28,8 +28,8 @@ def parse_args():
         print(f"Usage: {sys.argv[0]} <hostname> <port>")
         sys.exit(1)
     return (sys.argv[1], int(sys.argv[2]))
-    
-    
+
+
 if __name__ == "__main__":
     host, port = parse_args()
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
         .appName("StreamingWordCount") \
         .config('spark.dynamicAllocation.enabled', False) \
         .getOrCreate()
-    
+
     # Each input line read from the stream is mapped to a row in the DataFrame
     # and the text is included inside a column named `value`
     lines = spark.readStream \
