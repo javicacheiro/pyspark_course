@@ -28,7 +28,7 @@ import sys
 
 def parse_args():
     if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <hostname> <port>")
+        print("Usage: {} <hostname> <port>".format(sys.argv[0]))
         sys.exit(1)
     return (sys.argv[1], int(sys.argv[2]))
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     host, port = parse_args()
 
     spark = SparkSession.builder \
-        .appName("StreamingWordCount") \
+        .appName('StreamingWordCount') \
         .config('spark.dynamicAllocation.enabled', False) \
         .getOrCreate()
 
@@ -63,7 +63,6 @@ if __name__ == "__main__":
     query = wordCounts.writeStream \
         .format('console') \
         .outputMode('complete') \
-        .option('checkpointLocation', 'wordcount-chk') \
         .start()
 
     query.awaitTermination()
