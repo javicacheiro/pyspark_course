@@ -38,7 +38,8 @@ if __name__ == "__main__":
 
     spark = SparkSession.builder \
         .appName('StreamingWordCount') \
-        .config('spark.dynamicAllocation.enabled', False) \
+        .config("spark.sql.shuffle.partitions", 3) \
+        .config("spark.streaming.stopGracefullyOnShutdown", "true") \
         .getOrCreate()
 
     # Each input line read from the stream is mapped to a row in the DataFrame

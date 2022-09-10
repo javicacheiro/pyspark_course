@@ -1,6 +1,7 @@
 """
 Reads streaming data from the given TCP socket and
-prints the schema of the dataframe generated.
+prints the dataframe generated that acts like an
+unbounded table.
 
 ## Creating the TCP server
 
@@ -15,7 +16,7 @@ where <port> is the port where you want netcat to listen.
 To submit the application use:
 
     module load anaconda3
-    spark-submit Unit_8_spark_streaming-dataframe_schema.py <hostname> <port>
+    spark-submit Unit_8_spark_streaming-unbounded_table.py <hostname> <port>
 
 where <hostname> and <port> are the address and port of the TCP socket.
 """
@@ -34,7 +35,7 @@ if __name__ == "__main__":
     host, port = parse_args()
 
     spark = SparkSession.builder \
-        .appName("StreamingWordCount") \
+        .appName("StructuredStreamingUnboundedTable") \
         .config('spark.dynamicAllocation.enabled', False) \
         .getOrCreate()
 
@@ -46,4 +47,10 @@ if __name__ == "__main__":
         .option('port', port) \
         .load()
 
-    lines.printSchema()
+    # Start running the query
+    query = lines.writeStream \
+        .format('console') \
+        .outputMode('complete') \
+        .start()
+
+    query.awaitTermination()
