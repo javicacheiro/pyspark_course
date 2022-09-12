@@ -85,7 +85,7 @@ if __name__ == '__main__':
     ssc = StreamingContext(sc, INTERVAL)
     ssc.checkpoint('checkpoints-ssh')
 
-    kvs = KafkaUtils.createDirectStream(ssc, ['flume.syslog'], {"metadata.broker.list": "10.112.13.19:6667"}, valueDecoder = decode_avro)
+    kvs = KafkaUtils.createDirectStream(ssc, ['flume.syslog'], {"metadata.broker.list": "1.2.3.4:6667"}, valueDecoder = decode_avro)
     # The flume avro event is in the kafka value (kafka key is empty)
     events = kvs.map(lambda x: x[1])
     # If we are interested just in a given host
