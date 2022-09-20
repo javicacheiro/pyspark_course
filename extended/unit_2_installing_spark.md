@@ -107,5 +107,20 @@ spark-3.3.0-bin-hadoop3/bin/pyspark --master spark://spark-1.novalocal:7077
 >>> rdd.pipe('/bin/hostname').collect()
 ```
 
-Reference:
+## spark-defaults.conf
+We can also tune the configuration:
+```
+cp spark-3.3.0-bin-hadoop3/conf/spark-defaults.conf.template spark-3.3.0-bin-hadoop3/conf/spark-defaults.conf
+```
+Edit spark-defaults.conf and set:
+```
+spark.master spark://spark-1.novalocal:7077
+```
+
+Now you can start pyspark omitting the master url:
+```
+spark-3.3.0-bin-hadoop3/bin/pyspark
+```
+
+## Reference
 - https://spark.apache.org/docs/latest/spark-standalone.html
