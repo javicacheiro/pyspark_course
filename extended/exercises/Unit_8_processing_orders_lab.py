@@ -61,6 +61,10 @@ if __name__ == "__main__":
     #    .start()
 
     # When ready we use the real kafka sink
+
+    # To create the topic
+    #kafka-console-consumer.sh --bootstrap-server $BROKER --topic manufacturing
+
     kafka_df = products.selectExpr(
         "cast(order_id as string) as key",
         """to_json(
