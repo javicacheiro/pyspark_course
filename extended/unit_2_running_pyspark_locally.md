@@ -24,6 +24,21 @@ If you are using the Anaconda distribution you can install it with:
 conda install pyspark=2.4.0
 ```
 
+## Python version issues
+If you get an error of the type:
+```
+TypeError: an integer is required (got type bytes)
+```
+you have to check your Python version.
+
+Even if [Spark 2.4.0](https://spark.apache.org/docs/2.4.0/) documentation page says:
+    ```
+    Spark runs on Java 8+, Python 2.7+/3.4+ and R 3.1+. For the Scala API, Spark 2.4.0 uses Scala 2.11. You will need to use a compatible Scala version (2.11.x)."
+    Note that support for Java 7, Python 2.6 and old Hadoop versions before 2.6.5 were removed as of Spark 2.2.0. Support for Scala 2.10 was removed as of 2.3.0.
+    ```
+The reality is that Spark 2.4.0 does not support using python 3.8 (just up to 3.7).
+
+
 ## Running pyspark
 Now we can run pyspark in local mode:
 ```
