@@ -19,7 +19,7 @@ if __name__ == "__main__":
     df = spark.readStream \
         .format('kafka') \
         .option("kafka.bootstrap.servers", "10.38.28.103:9092") \
-        .option("subscribe", "tests.jlc") \
+        .option("subscribe", "tests.curso800") \
         .load()
 
     df.printSchema()
