@@ -1,8 +1,8 @@
 from __future__ import print_function
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_json, expr, to_json, window, expr, to_timestamp, lit
-from pyspark.sql.types import StructType, StructField, LongType, StringType, ArrayType
-from pyspark.ml import PipelineModel
+from pyspark.sql.functions import col, from_json, expr, to_json, window, expr, to_timestamp, lit, udf
+from pyspark.sql.types import StructType, StructField, LongType, StringType, ArrayType, DoubleType
+from textblob import TextBlob
 
 
 if __name__ == "__main__":
@@ -37,15 +37,17 @@ if __name__ == "__main__":
         to_timestamp(col("created_at"), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     )
 
-    # We will now load our sentiment analysis model from the amazon reviews lab
-    my_saved_model = PipelineModel.load('models/amazon_sentiment_analysis_cv_model')
+    # We will now load our sentiment analysis model using TextBlob
+    @udf(returnType=DoubleType())
+    def polarity(text):
+            return sum([s.polarity for s in TextBlob(text).sentences])
 
-    df = tweets.withColumn('reviewText', col('text')).withColumn('overall', lit(5.0))
-    with_predictions = my_saved_model.transform(df).select('created_at', 'text', 'prediction')
+    df = tweets.withColumn('polarity', polarity(col('text')))
+    with_predictions = df.select('created_at', 'text', 'polarity')
 
     tumbling_window = with_predictions.groupBy(
         window(col("created_at"), "5 minutes")
-    ).avg('prediction')
+    ).avg('polarity')
 
     # SINK
     sink = tumbling_window.writeStream \
