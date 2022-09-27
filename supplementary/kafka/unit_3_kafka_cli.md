@@ -59,7 +59,7 @@ kafka-topics.sh --bootstrap-server $BROKER --describe
 kafka-topics.sh --bootstrap-server $BROKER --topic test3.curso800 --delete
 ```
 
-## Kakfa Console Producer
+## kakfa-console-producer
 In the tools we have at our disposal a simple console producer
 ```
 kafka-console-producer.sh --bootstrap-server $BROKER --topic test1.curso800
@@ -70,6 +70,12 @@ The console producer allows us to set also specific properties:
 ```
 # Full acks
 kafka-console-producer.sh --bootstrap-server $BROKER --topic test1.curso800 --producer-property acks=all
+```
+
+We can also send the keys separated by `:` or any character that we choose:
+```
+kafka-console-producer.sh --bootstrap-server $BROKER --topic test1.curso800 --property parse.key=true --property key.separator=:
+>key0:my message
 ```
 
 If we point our producer to a non-existing topic then by default the new topic will be created using the default options.
@@ -99,6 +105,11 @@ kafka-console-consumer.sh --bootstrap-server $BROKER --topic test1.curso800
 By default it consumes just new messages, but we can request also old messages (offset):
 ```
 kafka-console-consumer.sh --bootstrap-server $BROKER --topic test1.curso800 --from-beginning
+```
+
+We can also print the keys of the messages:
+```
+kafka-console-consumer.sh --bootstrap-server $BROKER --topic lab1.curso800 --from-beginning --property print.key=true --property key.separator=:
 ```
 
 It also supports creating consumer groups.
@@ -227,15 +238,15 @@ kafka-topics.sh --bootstrap-server $BROKER --describe --topic items.curso800
 See it in action:
 - Console 1: Start a consumer
     ```
-    kafka-console-consumer.sh --bootstrap-server $BROKER --topic items.curso800 --from-beginning --property print.key=true --property key.separator=,
+    kafka-console-consumer.sh --bootstrap-server $BROKER --topic items.curso800 --from-beginning --property print.key=true --property key.separator=:
     ```
 - Console 2: start publishing data to the topic
     ```
-    kafka-console-producer.sh --bootstrap-server $BROKER --topic items.curso800 --property parse.key=true --property key.separator=,
-    >item0,my item 0
-    >item1,my item 1
-    >item2,my item 2
-    >item0,my renamed item 0
+    kafka-console-producer.sh --bootstrap-server $BROKER --topic items.curso800 --property parse.key=true --property key.separator=:
+    >item0:my item 0
+    >item1:my item 1
+    >item2:my item 2
+    >item0:my renamed item 0
     ```
 
 segment.ms: With this option, when Kafka receives a produce request, it will check that the active segment is older than segment.ms value. If it is older, then it will create a new segment. In our command, we set segment.ms=100 to make sure that every 100 milliseconds a new segment is created.
