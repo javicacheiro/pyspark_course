@@ -40,21 +40,24 @@ It will deploy the following services:
 - postgres: the database
 - redis: to forward messages from scheduler to workers
 
-Directories shared with the containers (docker mount volumes):
-- ./dags: you can put your DAG files here.
-- ./logs: contains logs from task execution and scheduler.
-- ./plugins: you can put your custom plugins here.
+Directories shared with the containers (docker volumes):
+- ./dags: where we will place our DAG files
+- ./logs: the logs from task execution and scheduler.
+- ./plugins: for our custom plugins
+
+Additionally we will edit `docker-compose.yaml` and add a new volume to store data:
 ```
-volumes:
-  - ./dags:/opt/airflow/dags
-  - ./logs:/opt/airflow/logs
-  - ./plugins:/opt/airflow/plugins
+    volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - ./data:/opt/airflow/data
 ```
 
 
 ### Initializing the environment:
 ```
-mkdir -p ./dags ./logs ./plugins
+mkdir -p ./dags ./logs ./plugins ./data
 echo -e "AIRFLOW_UID=$(id -u)" > .env
 ```
 
@@ -81,6 +84,21 @@ curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.4.0/airflow.sh'
 chmod +x airflow.sh
 ```
 
+Edit `airflow.sh` and replace `docker-compose run` by `sudo docker compose run`:
+```bash
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+set -euo pipefail
+
+export COMPOSE_FILE="${PROJECT_DIR}/docker-compose.yaml"
+if [ $# -gt 0 ]; then
+    exec sudo docker compose run --rm airflow-cli "${@}"
+else
+    exec sudo docker compose run --rm airflow-cli
+fi
+```
+
+
 Now simply run:
 ```
 ./airflow.sh info
@@ -100,6 +118,14 @@ The default account has the login airflow and the password airflow.
 ```
 sudo docker compose down
 ```
+
+### Cleaning up
+```
+docker-compose down --volumes --remove-orphans
+# Be sure to save what you want before removing these dirs
+rm -rf dags logs plugins data
+```
+
 
 Reference:
 - [Running Airflow in Docker](https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html)
