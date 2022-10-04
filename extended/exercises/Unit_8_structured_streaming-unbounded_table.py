@@ -50,7 +50,7 @@ if __name__ == "__main__":
     # Start running the query
     query = lines.writeStream \
         .format('console') \
-        .outputMode('complete') \
+        .outputMode('update') \
         .start()
 
     query.awaitTermination()
