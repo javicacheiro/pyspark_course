@@ -14,8 +14,10 @@
 7. Processing data incrementally
 8. Backfilling
 9. Datasets and Data-Aware Scheduling
-10. Airflow CLI
-11. References
+10. Web Interface Walkthrough
+11. Airflow CLI
+12. Tips
+13. References
 ```
 
 
@@ -50,13 +52,13 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 
 with DAG(
-    'dag_using_operators',
+    'etl_classic_api',
     default_args={
         'depends_on_past': False,
         'retries': 1,
         'retry_delay': timedelta(minutes=5),
     },
-    description='A simple DAG using BashOperator',
+    description='A simple ETL using BashOperator',
     schedule=timedelta(days=1),
     start_date=datetime(2022, 10, 1),
     catchup=False,
@@ -120,11 +122,10 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 with DAG(
-    'tutorial_dag',
-    default_args={'retries': 2},
-    description='DAG tutorial',
+    'etl_classic_api',
+    description='A simple ETL using Classic API',
     schedule="@daily",
-    start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
+    start_date=pendulum.datetime(2022, 1, 1, tz="UTC"),
     catchup=False,
     tags=['bigdata-lab'],
 ) as dag:
@@ -202,50 +203,35 @@ import pendulum
 from airflow.decorators import dag, task
 
 @dag(
+    description='A simple ETL using TaskFlow',
     schedule="@daily",
-    start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
+    start_date=pendulum.datetime(2022, 1, 1, tz="UTC"),
     catchup=False,
     tags=['bigdata-lab'],
 )
-def tutorial_taskflow_api():
+def etl_taskflow_api():
     @task()
     def extract():
-        """
-        #### Extract task
-        A simple Extract task to get data ready for the rest of the data
-        pipeline. In this case, getting data is simulated by reading from a
-        hardcoded JSON string.
-        """
         data_string = '{"1001": 301.27, "1002": 433.21, "1003": 502.22}'
-
         order_data_dict = json.loads(data_string)
         return order_data_dict
+
     @task(multiple_outputs=True)
     def transform(order_data_dict: dict):
-        """
-        #### Transform task
-        A simple Transform task which takes in the collection of order data and
-        computes the total order value.
-        """
         total_order_value = 0
-
         for value in order_data_dict.values():
             total_order_value += value
-
         return {"total_order_value": total_order_value}
+
     @task()
     def load(total_order_value: float):
-        """
-        #### Load task
-        A simple Load task which takes in the result of the Transform task and
-        instead of saving it to end user review, just prints it out.
-        """
-
         print(f"Total order value is: {total_order_value:.2f}")
+
     order_data = extract()
     order_summary = transform(order_data)
     load(order_summary["total_order_value"])
-tutorial_taskflow_api()
+
+etl_taskflow_api()
 ```
 
 ### Accessing context variables
@@ -286,6 +272,47 @@ def my_task():
     next_ds = context["next_ds"]
     print(execution_date, next_ds)
 ```
+
+### Combining TaskFlow tasks with traditional tasks
+We can instantiate any `decorated task` created with the TaskFlow API and then use it as if it was a `traditional task`. This way we can combine it with any traditional tasks created from operators:
+```python
+import json
+import pendulum
+from airflow.decorators import dag, task
+from airflow.operators.bash import BashOperator
+
+@dag(
+    description='Example of how to combine decorated and traditional tasks',
+    schedule="@daily",
+    start_date=pendulum.datetime(2022, 1, 1, tz="UTC"),
+    catchup=False,
+    tags=['bigdata-lab'],
+)
+def combining_decorated_and_traditional_tasks():
+    get_results_task = BashOperator(
+        task_id='get_results',
+        bash_command="""echo '{"results": [1, 2, 5]}'""",
+        do_xcom_push=True,
+    )
+
+    @task()
+    def process_results(results):
+        results = json.loads(results)
+        total = sum(results["results"])
+        print(f"Total is {total}")
+        return total
+
+    processed_results = process_results(results=get_results_task.output)
+
+combining_decorated_and_traditional_tasks()
+```
+
+NOTES:
+- BashOperator: If `do_xcom_push` is set to True the last line written to stdout will be pushed to an XCom when the bash command completes.
+- By default, using the `.output` property to retrieve an XCom result is a shorthand to:
+    ```
+    task_instance.xcom_pull(task_ids="my_task_id", key="return_value")
+    ```
 
 ## Scheduling
 We have different options to schedule DAG `jobs`:
@@ -370,12 +397,20 @@ Airflow allows to define a `start_date` in the past for our DAG. This way it wil
 
 To make use of this feature it is critical that we program our tasks so they do not depend on current time but on variables like `execution_date` that are provided by Airflow (see previous section).
 
-To enable this feature in our DAG we have to set `catchup=True`:
+This feature is usually enabled by default, it can be disabled by setting `catchup=False` in our DAG or by setting `catchup_by_default=False` in the configuration file.
+
+We can see the default value with:
+```
+airflow config get-value scheduler catchup_by_default
+```
+If there were no changes in the configuration, we will see that this is set to `True`.
+
+So if we want to disable it in our DAG we have to set `catchup=False`:
 ```python
 @dag(
     schedule_interval="@hourly",
     start_date=pendulum.datetime(2022, 9, 1, tz="UTC"),
-    catchup=True,
+    catchup=False,
     tags=['bigdata-lab'],
 )
 ```
@@ -386,6 +421,49 @@ New in Airlflow 2.4 (2022-09-19)!
 We can define datasets and use them to define dependencies between DAGs.
 
 A DAG can be configured so it is only run when a dataset is updated.
+
+## Web Interface Walkthrough
+
+### DAGs
+![Grid](http://bigdata.cesga.es/img/airflow_dags.png)
+
+### Grid
+![Grid](http://bigdata.cesga.es/img/airflow_grid.png)
+
+### Graph
+![Graph](http://bigdata.cesga.es/img/airflow_graph.png)
+
+### Calendar
+![Calendar](http://bigdata.cesga.es/img/airflow_calendar.png)
+
+### Duration
+![Duration](http://bigdata.cesga.es/img/airflow_duration.png)
+
+### Task Tries
+![Task Tries](http://bigdata.cesga.es/img/airflow_task_tries.png)
+
+### Landing Times
+![Landing Times](http://bigdata.cesga.es/img/airflow_landing_times.png)
+
+From Maxime Beauchemin, the original creator of Apache Airflow:
+```
+Maxime Beauchemin @mistercrunch Jun 09 2016 11:12
+it's the number of hours after the time the scheduling period ended
+take a schedule_interval='@daily' run for 2016-01-01 that finishes at 2016-01-02 03:52:00
+landing time is 3:52
+```
+
+### Gantt
+![Gantt](http://bigdata.cesga.es/img/airflow_gantt.png)
+
+### Details
+![Details](http://bigdata.cesga.es/img/airflow_details.png)
+
+### Code
+![Code](http://bigdata.cesga.es/img/airflow_code.png)
+
+### Audit Log
+![Audit Log](http://bigdata.cesga.es/img/airflow_audit_log.png)
 
 ## Airflow CLI
 Besides the convenient web interface, Airflow has also a powerful CLI interface.
@@ -449,15 +527,31 @@ airflow users list                        | List users
 airflow users remove-role                 | Remove role from a user
 ```
 
+## Tips
+- DAGs take some time to load in the web interface, remember to refresh if auto-refresh is not enabled
+- It also helps to look for the name of the new DAG in the search box
+- Sometimes when you load a DAG in the DAGs folder it does not appear in the web interface this could be due to import errors
+- Always look for import errors after adding new DAGs to the DAG folder:
+```
+airflow dags list-import-errors
+```
+- Import errors will also appear in the web interface in a message, but tend to be slow
+- If you can choose, use the new TaskFlow API
+
 ## Exercises
 - Lab 0: [Airflow installation](exercises/airflow_installation.md)
-- Lab: [Simple DAG using BashOperator](exercices/dag_using_operators.py)
-- Lab: [Complex Pipeline with dependencies](complex_pipeline_with_dependencies.py)
-- Lab: [Complex Pipeline with dependencies and inter-task communication](exercises/complex_pipeline_with_dependencies_and_inter_task_communication.py)
+- Lab 1: [Simple DAG using BashOperator](exercices/dag_using_operators.py)
+- Lab 2: ETL
+ - Creating a simple ETL with the classic API: [ETL Classic API](exercises/etl_classic_api.py)
+ - Creating a simple ETL with the TaskFlow API: [ETL TaskFlow API](exercises/etl_taskflow_api.py)
+- Lab 3: Complex Pipeline Examples
+  - Creating a complex pipeline with lots of dependencies: [Complex Pipeline with dependencies](exercises/complex_pipeline_with_dependencies.py)
+  - Adding a dummy task as a join task: [Complex Pipeline with dependencies and a dummy task](exercises/complex_pipeline_with_dependencies_dummy_task.py)
+  - Inter-task communication: [Complex Pipeline with dependencies and inter-task communication](exercises/complex_pipeline_with_dependencies_and_inter_task_communication.py)
 - Lab: [Wikimedia pipeline (using classic API)](exercises/wikimedia_pipeline.py)
 - Lab: [Wikimedia pipeline (using TaskFlow API)](exercises/wikimedia_pipeline_pure_python.py)
 - Lab: [Remote run DAG](exercises/remote_run_dag.py)
-- Lab 1: [Creating a data pipeline](exercises/creating_a_data_pipeline.md)
+- Lab: [Creating a data pipeline](exercises/creating_a_data_pipeline.md)
 
 ## References
 - [Fundamental Concepts](https://airflow.apache.org/docs/apache-airflow/stable/tutorial/fundamentals.html)
