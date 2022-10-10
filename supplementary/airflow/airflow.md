@@ -551,7 +551,18 @@ airflow dags list-import-errors
 - Lab 4: Running remote tasks
   - [Running remote tasks](exercises/running_remote_tasks.md)
   - [Remote run DAG](exercises/remote_run_dag.py)
-- Lab 5: [Creating a data pipeline](exercises/creating_a_data_pipeline.md)
+- Lab 5: How to use context variables like `execution_date` to define DAGs
+  - [wikimedia download using bashoperator](exercises/wikimedia_download_bashoperator.py)
+      NOTE: In this case we will trigger the DAG from the web interface with the "Trigger DAG w/ config" option
+      and there we will indicate the logical date in the time box.
+      Alternatively from the CLI so we can also specify a `execution_date` in the past:
+      ```
+      ./airflow.sh dags trigger -e '2022-10-10T12:00:00' wikimedia_download_bashoperator
+      ```
+      this is due to the fact that wikimedia pageviews sometimes are delayed up to 2 hours.
+  - [wikimedia download using pure python](exercises/wikimedia_download_pure_python.py)
+      NOTE: In this second example we do the trick directly in the python code
+- Lab 6: [Creating a data pipeline](exercises/creating_a_data_pipeline.md)
   - [Wikimedia pagecounts data pipeline that uses Spark for processing](exercises/wikimedia_data_pipeline.py)
   - [Spark Application to process wikimedia data](exercices/process_wikimedia_pagecounts.py)
 
