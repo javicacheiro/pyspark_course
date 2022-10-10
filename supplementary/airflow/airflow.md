@@ -436,8 +436,8 @@ A DAG can be configured so it is only run when a dataset is updated.
 ### Calendar
 ![Calendar](http://bigdata.cesga.es/img/airflow_calendar.png)
 
-### Duration
-![Duration](http://bigdata.cesga.es/img/airflow_duration.png)
+### Task Duration
+![Task Duration](http://bigdata.cesga.es/img/airflow_task_duration.png)
 
 ### Task Tries
 ![Task Tries](http://bigdata.cesga.es/img/airflow_task_tries.png)
