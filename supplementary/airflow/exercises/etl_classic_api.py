@@ -6,7 +6,7 @@ from airflow.operators.python import PythonOperator
 with DAG(
     'etl_classic_api',
     description='A simple ETL using Classic API',
-    schedule="@daily",
+    schedule="@hourly",
     start_date=pendulum.datetime(2022, 1, 1, tz="UTC"),
     catchup=False,
     tags=['bigdata-lab'],

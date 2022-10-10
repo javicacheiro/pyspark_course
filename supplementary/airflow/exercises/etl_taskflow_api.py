@@ -4,7 +4,7 @@ from airflow.decorators import dag, task
 
 @dag(
     description='A simple ETL using TaskFlow',
-    schedule="@daily",
+    schedule="@hourly",
     start_date=pendulum.datetime(2022, 1, 1, tz="UTC"),
     catchup=False,
     tags=['bigdata-lab'],

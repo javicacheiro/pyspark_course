@@ -548,10 +548,12 @@ airflow dags list-import-errors
   - Creating a complex pipeline with lots of dependencies: [Complex Pipeline with dependencies](exercises/complex_pipeline_with_dependencies.py)
   - Adding a dummy task as a join task: [Complex Pipeline with dependencies and a dummy task](exercises/complex_pipeline_with_dependencies_dummy_task.py)
   - Inter-task communication: [Complex Pipeline with dependencies and inter-task communication](exercises/complex_pipeline_with_dependencies_and_inter_task_communication.py)
-- Lab: [Wikimedia pipeline (using classic API)](exercises/wikimedia_pipeline.py)
-- Lab: [Wikimedia pipeline (using TaskFlow API)](exercises/wikimedia_pipeline_pure_python.py)
-- Lab: [Remote run DAG](exercises/remote_run_dag.py)
-- Lab: [Creating a data pipeline](exercises/creating_a_data_pipeline.md)
+- Lab 4: Running remote tasks
+  - [Running remote tasks](exercises/running_remote_tasks.md)
+  - [Remote run DAG](exercises/remote_run_dag.py)
+- Lab 5: [Creating a data pipeline](exercises/creating_a_data_pipeline.md)
+  - [Wikimedia pagecounts data pipeline that uses Spark for processing](exercises/wikimedia_data_pipeline.py)
+  - [Spark Application to process wikimedia data](exercices/process_wikimedia_pagecounts.py)
 
 ## References
 - [Fundamental Concepts](https://airflow.apache.org/docs/apache-airflow/stable/tutorial/fundamentals.html)
