@@ -6,13 +6,35 @@ Instantiate 3 VM in Openstack:
   - Instance Name: opensearch-curso825
   - Count: 3
   - Source: baseos-Rocky-8.5-v2
-  - Flavor: m1.xlarge (you can use a smaller setting editing run_docker-opensearch_version.sh and reducing the memory)
+  - Flavor: 
+    - m1.medium: 4GB, 2 cores (this is more than enough for the lab, but you have to edit the `openstack/run_docker-opensearch_version.sh` helper script and reduce the memory)
+    - m1.xlarge: 16GB RAM, 8 cores (for production)
   - Networks: provnet-formacion-vlan-133
   - Security Groups: default
     NOTE: The default security group is already configured to enable communication between the instances
   - Key Pair: your imported key pair
 
 ## Configuring an OpenSearch Cluster
+I will be using [ClusterShell](https://clustershell.readthedocs.io/en/latest/) but you can also run the commands individually in each of the servers.
+
+
+If you want to use ClusterShell my recommendation is to install it locally in your computer. But as an alternative you can install it in one of the nodes:
+```
+sudo dnf install epel-release
+sudo dnf install clustershell
+```
+NOTE: You will have to setup remote ssh access with public key.
+
+Add the vm instances to your `/etc/hosts` and to the `/etc/hosts` of the remote servers:
+```
+# opensearch deployment on openstack
+1.2.3.4 opensearch-1 opensearch-1.novalocal
+1.2.3.4 opensearch-2 opensearch-2.novalocal
+1.2.3.4 opensearch-3 opensearch-3.novalocal
+1.2.3.4 kibana kibana.novalocal
+```
+
+Now we can proceed:
 ```
 clush -l cesgaxuser -bw opensearch-[1-3] sudo dnf -y update
 
@@ -52,7 +74,9 @@ http --verify no --auth admin:admin 'https://opensearch-1:9200/_cat/health?v&pre
 ```
 
 ## Kibana
-Once elasticsearch has started you can run kibana:
+Once elasticsearch has started you can run kibana.
+
+You will have to edit the `run_kibana-opensearch_version.sh` to point to the right opensearch instance addresses:
 ```
 clush -l cesgaxuser -bw kibana --copy openstack/run_kibana-opensearch_version.sh --dest /home/cesgaxuser
 clush -l cesgaxuser -bw kibana sudo /home/cesgaxuser/run_kibana-opensearch_version.sh
@@ -60,7 +84,7 @@ clush -l cesgaxuser -bw kibana sudo /home/cesgaxuser/run_kibana-opensearch_versi
 
 Go to kibana:
 
-    http://10.38.29.17:5601
+    http://kibana:5601
 
 NOTE: Be careful because kibana by default would resolve to kibana.service.int.cesga.es (the production one)
 
@@ -133,26 +157,4 @@ As you can see it is much, much more user friendly than curl.
 Cleaning:
 ```
 curl --insecure --user admin:admin -X DELETE https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)
-```
-## Logstash
-Running logstash:
-```
-clush -l cesgaxuser -bw opensearch-[1-3] --copy openstack/run_logstash.sh --dest /home/cesgaxuser
-sudo ./run_logstash.sh
-```
-
-See the output of logstash:
-```
-# using curl
-curl --insecure --user admin:admin 'https://opensearch-1:9200/opensearch-logstash-docker-2022.08.13/_search?pretty=true'
-curl --insecure --user admin:admin 'https://opensearch-1:9200/opensearch-logstash-docker-2022.08.13/_search?pretty=true' -d '{"size": 1}'
-
-# using httpie (no need for the pretty option)
-http --verify no --auth admin:admin 'https://opensearch-1:9200/opensearch-logstash-docker-2022.08.13/_search'
-http --json --verify no --auth admin:admin 'https://opensearch-1:9200/opensearch-logstash-docker-2022.08.13/_search' size=1
-```
-
-Cleaning:
-```
-curl --insecure --user admin:admin -X DELETE https://opensearch-1:9200/opensearch-logstash-docker-2022.08.13
 ```
