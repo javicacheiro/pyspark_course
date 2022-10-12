@@ -6,7 +6,7 @@ Instantiate 3 VM in Openstack:
   - Instance Name: opensearch-curso825
   - Count: 3
   - Source: baseos-Rocky-8.5-v2
-  - Flavor: m1.medium
+  - Flavor: m1.xlarge (you can use a smaller setting editing run_docker-opensearch_version.sh and reducing the memory)
   - Networks: provnet-formacion-vlan-133
   - Security Groups: default
     NOTE: The default security group is already configured to enable communication between the instances
@@ -26,7 +26,10 @@ clush -l cesgaxuser -bw opensearch-[1-3] --copy openstack/configure_data_volume.
 clush -l cesgaxuser -bw opensearch-[1-3] sudo /tmp/configure_data_volume.sh
 
 clush -l cesgaxuser -bw opensearch-[1-3] sudo reboot
+```
 
+Edit `run_docker-opensearch_version.sh` and set the right IP addresses for the nodes. Then upload it to the VMs and execute it by running:
+```
 clush -l cesgaxuser -bw opensearch-[1-3] --copy openstack/run_docker-opensearch_version.sh --dest /home/cesgaxuser
 clush -l cesgaxuser -bw opensearch-[1-3] sudo /home/cesgaxuser/run_docker-opensearch_version.sh
 clush -l cesgaxuser -bw opensearch-[1-3] sudo docker ps
@@ -71,6 +74,66 @@ clush -l cesgaxuser -bw opensearch-[1-3] sudo rm -rf /data/opensearch
 clush -l cesgaxuser -bw kibana sudo docker rm -f kibana
 ```
 
+## Logstash
+In this case, instead of using a dedicated node we will be using the kibana node to run logstash.
+
+Copy the helper script:
+```
+scp ../logstash/input_stdin.sh  cesgaxuser@kibana:run_logstash_input_stdin.sh
+```
+
+You will have to set the OPENSEARCH_HOST and OPENSEARCH_PORT variables.
+```
+export OPENSEARCH_HOST="1.2.3.4"
+export OPENSEARCH_PORT="9200"
+```
+
+Running logstash:
+```
+sudo ./run_logstash_input_stdin.sh
+```
+
+Later on in the course we will see sample configurations for running logstash.
+
+Right now with the provided script we will run logstash so that it reads stdin and publishes to the opensearch index: `opensearch-logstash-test-%{+YYYY.MM.dd}`.
+
+The `stdin` input plugin will read events from standard input, each event is assumed to be one line.
+
+Write some lines of text and then see how they appear in elasticsearch.
+
+See the output of logstash:
+```
+curl --insecure --user admin:admin -X GET "https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)/_search?pretty=true"
+```
+
+If you just want one document:
+```
+curl --insecure --user admin:admin -X GET -H "Content-Type: application/json" "https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)/_search?pretty=true" -d '{"size": 1}'
+```
+
+As an alternative to curl you can use httpie (no need for the pretty option):
+- [HTTPie](https://httpie.io/)
+
+Installing httpie:
+```
+sudo dnf install epel-release
+sudo dnf install httpie
+```
+
+Using httpie:
+```
+http --verify no --auth admin:admin "https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)/_search"
+```
+and instead of `-H "Content-Type: application/json"` we can use the `--json` option to indicate that we will be sending a json object in the request body:
+```
+http --json --verify no --auth admin:admin "https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)/_search" size=1
+```
+As you can see it is much, much more user friendly than curl.
+
+Cleaning:
+```
+curl --insecure --user admin:admin -X DELETE https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)
+```
 ## Logstash
 Running logstash:
 ```
