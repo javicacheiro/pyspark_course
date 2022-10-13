@@ -32,7 +32,7 @@ def wikimedia_data_pipeline():
         # When we run remotely we have to create the data directory first in
         # the target machine
         output_file = f"pageviews-{year}-{month:0>2}-{day:0>2}-{hour:0>2}.gz"
-        stdout, stderr = run(f"cd data && curl -o {output_file} {url}", host='hadoop.cesga.es', user='curso800')
+        stdout, stderr = run(f"cd HOMEBD/data && curl -o {output_file} {url}", host='dtn.srv.cesga.es', user='curso800')
         print(stdout, stderr)
         return output_file
 

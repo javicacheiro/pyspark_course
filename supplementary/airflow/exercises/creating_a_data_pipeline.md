@@ -9,7 +9,9 @@ ssh-copy-id cursoXXX@hadoop.cesga.es
 
 Verify access:
 ```
+# DTN
 ssh cursoXXX@dtn.srv.cesga.es
+# Hadoop
 ssh cursoXXX@hadoop.cesga.es
 ```
 
@@ -30,15 +32,16 @@ scp process_wikimedia_pagecounts.py curso800@hadoop.cesga.es:
 ```
 
 ## Create the required dirs in the remote servers
-DTN:
-```
-mkdir data
-```
 Hadoop:
 ```
 mkdir data
 ```
-For this example we will store the files in the user home of HDFS, for production we would create a dedicated dir in HDFS.
+DTN:
+```
+ln -s $HOMEBD HOMEBD
+```
+
+For this lab we will store the files directly in the user home of HDFS so we do not have to create any dir in HDFS. For production we would create a dedicated dir in HDFS.
 
 ## Load the Pipeline
 ```
