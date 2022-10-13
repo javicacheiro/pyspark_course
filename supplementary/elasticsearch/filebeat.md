@@ -14,18 +14,9 @@ We can now configure the `paths` where filebeat will look for logs as well as de
 ```
 sudo vi /etc/filebeat/filebeat.yml
 ```
-For example we can set:
+
+Review the file and set the following options:
 ```
-- type: log
-
-  enabled: true
-
-  paths:
-    - /var/log/*.log
-    - /var/log/messages
-    - /var/log/cron
-    - /var/log/*/*.log
-
 tags: ["bigdata-lab", "opensearch-curso825"]
 
 logging.level: warning
@@ -46,14 +37,21 @@ There are different data collection modules for popular tools:
     ```
     sudo filebeat modules list
     ```
-- For example if we had mysql installed we could enable the mysql module:
+- For example if we had apache installed we could enable the `apache` module:
     ```
-    sudo filebeat modules enable system mysql
+    sudo filebeat modules enable apache
     ```
 - We can also edit the modules config and customize them, they are just configuration files under `/etc/filebeat/modules.d/`:
     ```
     ls /etc/filebeat/modules.d/
     ```
+
+In our case we will enable the `system` module:
+```
+sudo filebeat modules enable system
+```
+
+Alternatively we could have configured the input log in `filebeat.yml` with a custom list of files and enable it.
 
 ## A note on OpenSearch
 Since we are using OpenSearch instead of ElasticSearch we must enable compatibility mode so filebeat setup is able to work correctly uploading the assets (index, dashboard, etc):
@@ -142,19 +140,17 @@ We can check that it is running with:
 sudo systemctl status filebeat
 ```
 
+## See data arriving to Kibana
+We can now go to the `Discover` view in Kibana, we select the `filebeat-*` index pattern and we should see data coming.
+
+We can also go to the `Dashboards` view and select the dashboards that we have loaded before.
+
 ## Debugging problems
 ```
 # Test we are able to write to output 
 filebeat test output
 # Run interactively with debug level
 filebeat -e -d '*'
-```
-
-Apply tuned profile:
-```
-root@opensearch-curso825 log]# tuned-adm active
-Current active profile: virtual-guest
-[root@opensearch-curso825 log]# tuned-adm profile throughput-performance
 ```
 
 Increase number of open files

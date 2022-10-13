@@ -27,6 +27,18 @@ output.elasticsearch:
   password: "admin"
 ```
 
+And now we will enable some metrics collection modules.
+
+We can see the list of available collection modules with:
+```
+sudo metricbeat modules list
+```
+
+We will enable the `linux` and `docker` collection modules:
+```
+sudo metricbeat modules enable linux docker
+```
+
 ## A note on OpenSearch
 Since we are using OpenSearch instead of ElasticSearch we must enable compatibility mode so filebeat setup is able to work correctly uploading the assets (index, dashboard, etc):
 ```
@@ -113,6 +125,11 @@ We can check that it is running with:
 ```
 sudo systemctl status metricbeat
 ```
+
+## See data arriving to Kibana
+We can now go to the `Discover` view in Kibana, we select the `metricbeat-*` index pattern and we should see data coming.
+
+We can also go to the `Dashboards` view and select the dashboards that we have loaded before.
 
 ## References
 - [OpenSearch: Agents and ingestion tools](https://opensearch.org/docs/latest/clients/agents-and-ingestion-tools/index/)
