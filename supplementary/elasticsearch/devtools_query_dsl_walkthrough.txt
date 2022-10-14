@@ -265,20 +265,30 @@ GET movies/_termvectors/135569?fields=genres
 # We see that it has been splitted in "sci" and "fi"!!
 
 # This is fixed in the movies-tuned index mapping "genres" as "keyword" instead of the default "text" type
+GET movies-tuned
 GET movies-tuned/_doc/135569
 GET movies-tuned/_termvectors/135569?fields=genres
 
+# Testing what different tokenizers return
 POST _analyze
 {
   "tokenizer": "keyword",
   "text": "Sci-Fi"
 }
 
-
 POST _analyze
 {
   "tokenizer": "standard",
   "text": "Sci-Fi"
+}
+
+# And now we can look for the Sci-Fi genre using "Sci-Fi":
+GET movies-tuned/_search
+{
+  "query": {
+    "term": {"genres": "Sci-Fi"}
+  },
+  "_source": ["title", "year", "genres"]
 }
 
 # terms
@@ -541,17 +551,6 @@ GET movies/_search
   "size": 0
 }
 
-GET movies-tuned/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        {"match_phrase": {"title": "Harry Potter and the Prisoner of Azkaban"}}
-      ]
-    }
-  }
-}
-
 # Average rating given to Action movies per year for movies from 2010
 GET ratings/_search
 {
@@ -582,5 +581,108 @@ GET ratings/_search
   "size": 0
 }
 
+# Let's calculate some aggregrations on Harry Potter's movies released since 2010 
+GET ratings/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match_phrase": {"title": "harry potter"}},
+        {"range": {"year": {"gte": 2010}}
+        }
+      ]
+    }
+  }
+}
+
+# Total user ratings for Harry Potter movies released since 2010
+GET ratings/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match_phrase": {"title": "harry potter"}},
+        {"range": {"year": {"gte": 2010}}
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "per_year": {
+      "terms": {
+        "field": "title.raw"
+      }
+    }
+  },
+  "size": 0
+}
+
+# Average rating given to Harry Potter movies released since 2010
+GET ratings/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match_phrase": {"title": "harry potter"}},
+        {"range": {"year": {"gte": 2010}}
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "per_year": {
+      "terms": {
+        "field": "title.raw"
+      },
+      "aggs": {
+        "avg_rating": {
+          "avg": {
+            "field": "rating"
+          }
+        }
+      }
+    }
+  },
+  "size": 0
+}
+
+#
+# Let's create a date histogram
+#
+
+# First we have to verify that the @timestamp field is read in seconds and not the default millisecons ("strict_date_optional_time||epoch_second")
+GET ratings
+
+# We can check that it is working with a range query per year
+GET ratings/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match_phrase": {"title": "harry potter"}},
+        {"range": {"@timestamp": {"gte": 2010}}
+        }
+      ]
+    }
+  }
+}
+
+# And now we can create a date histogram of reviews of Harry Potter's movies per year
+GET ratings/_search
+{
+  "query": {
+    "match_phrase": {"title": "harry potter"}
+  },
+  "aggs": {
+    "timestamp": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "interval": "year"
+      }
+    }
+  },
+  "size": 0
+}
+
 # Count
-GET /movies/_count
+GET /ratings/_count
