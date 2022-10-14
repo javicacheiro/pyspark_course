@@ -1,0 +1,586 @@
+# match_all
+GET /movies/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+# match_all is the default
+GET /movies/_search
+{
+}
+
+# match
+GET /movies/_search
+{
+  "query": {
+    "match": {"title": "harry"}
+  }
+}
+
+# _source
+GET /movies/_search
+{
+  "query": {
+    "match": {"title": "harry"}
+  },
+  "_source": "title"
+}
+
+# _source, size
+GET /movies/_search
+{
+  "query": {
+    "match": {"title": "harry"}
+  },
+  "_source": ["title", "year"],
+  "size": 2
+}
+
+# match: for analyzed fields search is case insensitive
+GET /movies/_search
+{
+  "query": {
+    "match": {"title": "Harry"}
+  },
+  "_source": "title"
+}
+
+# match: with two words includes all possibilities
+#        The documents that match both words have a higher "_score" value
+GET /movies/_search
+{
+  "query": {
+    "match": {"title": "harry potter"}
+  },
+  "_source": "title"
+}
+
+# match_phrase: when we want the exact phrase
+GET /movies/_search
+{
+  "query": {
+    "match_phrase": {"title": "harry potter"}
+  },
+  "_source": "title"
+}
+
+# match_phrase without slop (default)
+GET /movies/_search
+{
+  "query": {
+    "match_phrase": {"title": "harry potter"}
+  },
+  "_source": "title"
+}
+
+# match_phrase with slop=1
+GET /movies/_search
+{
+  "query": {
+    "match_phrase": {
+      "title": {
+        "query": "harry and",
+        "slop": 1
+      }
+    }
+  },
+  "_source": "title"
+}
+
+# multi_match: match over several fields
+GET /movies/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "action",
+      "fields": ["title", "genres"]
+    }
+  },
+  "_source": ["title", "genres"]
+}
+
+# fuzzy: we made a typo and wrote "bottel" instead of "bottle"
+GET /movies/_search
+{
+ "query": {
+    "fuzzy": { "title": "bottel"}
+ }
+}
+
+# More fuzziness: fuzziness=2
+GET /movies/_search
+{
+ "query": {
+    "fuzzy": { 
+        "title": {
+            "value": "bottel",
+            "fuzziness": 2
+        }
+    }
+ }
+}
+
+# prefix
+GET /movies/_search
+{
+ "query": {
+    "prefix": { "title": "har"}
+ }
+}
+
+# wildcard
+GET /movies/_search
+{
+ "query": {
+    "wildcard": { "title": "har???"}
+ }
+}
+
+# wildcard
+GET /movies/_search
+{
+ "query": {
+    "wildcard": { "title": "har*"}
+ }
+}
+
+# wildcard
+GET /movies/_search
+{
+ "query": {
+    "wildcard": { "title": "h?r*"}
+ }
+}
+
+# regexp
+GET /movies/_search
+{
+ "query": {
+    "regexp": { "title": "h.r.."}
+ }
+}
+
+# regexp
+GET /movies/_search
+{
+ "query": {
+    "regexp": { "title": "h[ao]r.."}
+ }
+}
+
+# boosting queries
+GET /movies/_search
+{
+  "query": {
+    "boosting": {
+      "positive": {
+        "term": {
+          "title": "harry"
+        }
+      },
+      "negative": {
+        "term": {
+          "text": "potter"
+        }
+      },
+      "negative_boost": 0.5
+    }
+  }
+}
+
+# constant score: all documents that match will get a fixed score (1.5 in this case)
+GET /movies/_search
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "term": { "title": "potter" }
+      },
+      "boost": 1.5
+    }
+  }
+}
+
+# range
+GET movies/_search
+{
+  "query": {
+    "range": {"year": {"gte": 2010}}
+  },
+  "_source": ["title", "year"]
+}
+
+# range: 2010 >= year >= 2012
+GET movies/_search
+{
+  "query": {
+    "range": {"year": {"gte": 2010, "lte": 2012}}
+  },
+  "_source": ["title", "year"]
+}
+
+# range: from 2010 to 2012
+GET movies/_search
+{
+  "query": {
+    "range": {"year": {"from": 2010, "to": 2012}}
+  },
+  "_source": ["title", "year"]
+}
+
+# term
+GET movies/_search
+{
+  "query": {
+    "term": {"genres": "drama"}
+  },
+  "_source": ["title", "year", "genres"]
+}
+
+# Be careful: you have to give the genre in small case because it is mapped as keyword
+# If you do not do it: it will not match
+GET movies/_search
+{
+  "query": {
+    "term": {"genres": "Drama"}
+  },
+  "_source": ["title", "year", "genres"]
+}
+
+# What happened with the "Sci-Fi" genre? Which was the result of the analysis?
+GET movies/_search
+{
+  "query": {
+    "term": {"genres": "sci-fi"}
+  },
+  "_source": ["title", "year", "genres"]
+}
+
+# How was "Sci-Fi" analyzed?
+# Let's see how the genres Sci-Fi was tokenized using the new Term vectors API for the film with id 135569 (Star Trek Beyond)
+GET movies/_doc/135569
+GET movies/_termvectors/135569?fields=genres
+# We see that it has been splitted in "sci" and "fi"!!
+
+# This is fixed in the movies-tuned index mapping "genres" as "keyword" instead of the default "text" type
+GET movies-tuned/_doc/135569
+GET movies-tuned/_termvectors/135569?fields=genres
+
+POST _analyze
+{
+  "tokenizer": "keyword",
+  "text": "Sci-Fi"
+}
+
+
+POST _analyze
+{
+  "tokenizer": "standard",
+  "text": "Sci-Fi"
+}
+
+# terms
+GET movies/_search
+{
+  "query": {
+    "terms": {"genres": ["drama", "action"]}
+  },
+  "_source": ["title", "year", "genres"]
+}
+
+# terms
+GET movies/_search
+{
+  "query": {
+    "terms": {"year": [2010, 2011]}
+  },
+  "_source": ["title", "year"]
+}
+
+# exists
+GET movies/_search
+{
+  "query": {
+    "exists": {"field": "year"}
+  }
+}
+
+#
+# Compound queries
+#
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+      ],
+      "must_not": [
+      ],
+      "should": [
+      ],
+      "filter": [
+      ]
+    } 
+  }
+}
+
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"range": {"year": {"gte": 2010}}},
+        {"match": {"title": "star"}}
+      ]
+    } 
+  },
+  "_source": ["title", "year"]
+}
+
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"range": {"year": {"gte": 2010}}},
+        {"match": {"title": "star"}}
+      ],
+      "must_not": [
+        {"match": {"title": "superman"}}
+      ],
+      "should": [
+        {"match": {"title": "trek"}}
+      ],
+      "filter": [
+        {"term": {"genres": "action"}}
+      ]
+    } 
+  },
+  "_source": ["title", "year", "genres"]
+}
+
+#
+# Difference between QUERY and FILTER
+#
+
+# Filter does not compute scores: "_score"=0
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+      ],
+      "must_not": [
+      ],
+      "should": [
+      ],
+      "filter": [
+        {"term": {"genres": "action"}}
+      ]
+    } 
+  }
+}
+
+# Query computes scores: "_score"
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"term": {"genres": "action"}}
+      ],
+      "must_not": [
+      ],
+      "should": [
+      ],
+      "filter": [
+      ]
+    } 
+  }
+}
+
+# range in should clause: year>=2013
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"title": "trek"}}
+      ],
+      "should": [
+        {"range": {"year": {"gte": 2013}}}
+      ], 
+      "filter": [
+        {"term": {"genres": "action"}}
+      ]
+    } 
+  },
+  "_source": ["title", "year", "genres"]
+}
+
+# Now let's put the year>=2013 in the filter
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"title": "trek"}}
+      ],
+      "should": [
+      ], 
+      "filter": [
+        {"range": {"year": {"gte": 2013}}},
+        {"term": {"genres": "action"}}
+      ]
+    } 
+  },
+  "_source": ["title", "year", "genres"]
+}
+
+#
+# Sorting
+#
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match_phrase": {"title": "star trek"}}
+      ],
+      "should": [
+      ], 
+      "filter": [
+        {"term": {"genres": "action"}}
+      ]
+    } 
+  },
+  "sort": [
+    {
+      "year": {
+        "order": "desc"
+      }
+    }
+  ],
+  "_source": ["title", "year"]
+}
+
+# We can not sort by text fields!!
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match_phrase": {"title": "star trek"}}
+      ],
+      "should": [
+      ], 
+      "filter": [
+        {"term": {"genres": "action"}}
+      ]
+    } 
+  },
+  "sort": [
+    {
+      "year": {
+        "order": "desc"
+      },
+      "title": {
+        "order": "desc"
+      }
+      
+    }
+  ],
+  "_source": ["title", "year"]
+}
+
+#
+# Aggregations
+#
+
+# Films per year since 2014
+# NOTE: we use size=0 because we do not want the results, just the aggregations
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {"range": {"year": {"gte": "2014"}}}
+      ]
+    }
+  },
+  "aggs": {
+    "per_year": {
+      "terms": {
+        "field": "year"
+      }
+    }
+  },
+  "size": 0
+}
+
+# Films per year since 2014: show just 2 buckets (the other buckets are not returned)
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {"range": {"year": {"gte": "2014"}}}
+      ]
+    }
+  },
+  "aggs": {
+    "per_year": {
+      "terms": {
+        "field": "year",
+        "size": 2
+      }
+    }
+  },
+  "size": 0
+}
+
+GET movies-tuned/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match_phrase": {"title": "Harry Potter and the Prisoner of Azkaban"}}
+      ]
+    }
+  }
+}
+
+# Average rating given to Action movies per year for movies from 2010
+GET ratings/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {"term": {"genres": "Action"}},
+        {"range": {"year": {"gte": 2010}}
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "per_year": {
+      "terms": {
+        "field": "year",
+        "size": 20
+      },
+      "aggs": {
+        "avg_rating": {
+          "avg": {
+            "field": "rating"
+          }
+        }
+      }
+    }
+  },
+  "size": 0
+}
+
+# Count
+GET /movies/_count
