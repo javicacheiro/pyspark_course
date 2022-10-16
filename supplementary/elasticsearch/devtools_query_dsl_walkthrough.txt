@@ -130,6 +130,30 @@ GET /movies/_search
  }
 }
 
+# match_phrase_prefix: query-time search as you type
+GET /movies/_search
+{
+ "query": {
+    "match_phrase_prefix": { 
+      "title": "harry pot"
+    }
+ }
+}
+
+# match_phrase_prefix: query-time search as you type
+#   we can use slop to search also for words separated in the title
+GET /movies/_search
+{
+ "query": {
+    "match_phrase_prefix": { 
+      "title": {
+        "query": "harry prin",
+        "slop": 10
+      }
+    }
+ }
+}
+
 # wildcard
 GET /movies/_search
 {
