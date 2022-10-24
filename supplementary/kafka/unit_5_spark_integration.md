@@ -1,3 +1,4 @@
+# Spark Integration
 ## Using Kafka from Spark
 Verify the scala version of our Spark installation running `spark-shell`:
 ```
