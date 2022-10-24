@@ -17,4 +17,4 @@ broker = os.environ['KAFKA_BROKER']
 consumer = KafkaConsumer('test.curso800', bootstrap_servers=broker)
 
 for message in consumer:
-    print (message)
+    print(message)

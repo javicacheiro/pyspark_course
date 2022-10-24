@@ -191,6 +191,14 @@ def consume_loop(consumer, topics):
         consumer.close()
 ```
 
+## Examples
+- [Producer using Confluent Kafka](producer_using_confluent_kafka.py)
+- [Producer using kafka-python](producer_using_kafka-python.py)
+- [Producer using kafka-python: sending JSON](producer_using_kafka-python_json.py)
+- [Consumer using Confluent Kafka](consumer_using_confluent_kafka.py)
+- [Consumer using kafka-python](consumer_using_kafka-python.py)
+- [Consumer using kafka-python: sending JSON](consumer_using_kafka-python_json.py)
 
-# Reference
+## References
 - [Confluent Kafka Python Client](https://docs.confluent.io/kafka-clients/python/current/overview.html)
+- [Kafka-python Client](https://kafka-python.readthedocs.io/en/master/)
