@@ -25,7 +25,7 @@ module load anaconda3/2022.05
 
 
 ## Initialization
-```
+```python
 from confluent_kafka import Producer
 import socket
 
@@ -36,13 +36,13 @@ producer = Producer(conf)
 ```
 
 ## Asynchronous writes
-```
+```python
 producer.produce(topic, key="key", value="value")
 ```
 NOTE: The `key` is optional, and the `value` can be `None`.
 
 To receive acknowledgements:
-```
+```python
 def acked(err, msg):
     if err is not None:
         print("Failed to deliver message: %s: %s" % (str(msg), str(err)))
@@ -58,24 +58,23 @@ producer.poll(1)
 
 ## Synchronous writes
 Just call the `flush` method to make writes synchronous:
-```
+```python
 producer.produce(topic, key="key", value="value")
 producer.flush()
 ```
 
 # Kafka Consumer
 ## Initialization
-```
+```python
 from confluent_kafka import Producer
-import socket
 
 conf = {'bootstrap.servers': "host1:9092,host2:9092",
-        'client.id': socket.gethostname()}
+        'group.id': "consumer_group_name"}
 
-producer = Producer(conf)
+consumer = Consumer(conf)
 ```
 ## Basic poll loop
-```
+```python
 running = True
 
 def basic_consume_loop(consumer, topics):
@@ -105,7 +104,7 @@ def shutdown():
 
 ## Synchronous commits
 The simplest and most reliable way to manually commit offsets is by setting the asynchronous parameter to the Consumer.commit() method call.
-```
+```python
 def consume_loop(consumer, topics):
     try:
         consumer.subscribe(topics)
@@ -135,7 +134,7 @@ A synchronous commit is triggered every MIN_COMMIT_COUNT messages. The asynchron
 
 ## Delivery guarantees
 In the previous example, you get “at least once” delivery since the commit follows the message processing. By changing the order, however, you can get “at most once” delivery, but you must be a little careful with the commit failure.
-```
+```python
 def consume_loop(consumer, topics):
     try:
         consumer.subscribe(topics)
@@ -164,7 +163,7 @@ For simplicity in this example, Consumer.commit() is used prior to processing th
 
 ## Asynchronous Commits
 In this example, the consumer sends the request and returns immediately by using asynchronous commits.
-```
+```python
 def consume_loop(consumer, topics):
     try:
         consumer.subscribe(topics)
