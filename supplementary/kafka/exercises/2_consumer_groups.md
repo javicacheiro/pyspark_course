@@ -13,7 +13,7 @@ kafka-console-consumer.sh --bootstrap-server $BROKER --topic lab2.curso800 --gro
 
 Start sending messages:
 ```
-kafka-console-consumer.sh --bootstrap-server $BROKER --topic lab2.curso800 --group consumer-group-1
+kafka-console-producer.sh --bootstrap-server $BROKER --topic lab2.curso800
 >key0:message 0
 >key1:message 1
 >key2:message 2
