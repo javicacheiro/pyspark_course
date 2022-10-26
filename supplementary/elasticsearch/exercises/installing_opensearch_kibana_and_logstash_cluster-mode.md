@@ -148,13 +148,15 @@ Using httpie:
 ```
 http --verify no --auth admin:admin "https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)/_search"
 ```
+
 and instead of `-H "Content-Type: application/json"` we can use the `--json` option to indicate that we will be sending a json object in the request body:
 ```
 http --json --verify no --auth admin:admin "https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)/_search" size=1
 ```
+
 As you can see it is much, much more user friendly than curl.
 
-Cleaning:
+Finally, we can do some cleaning and remove the index:
 ```
 curl --insecure --user admin:admin -X DELETE https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)
 ```
