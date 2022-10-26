@@ -24,6 +24,9 @@ SELECT title, year FROM movies-tuned WHERE title LIKE 'harry';
 
 WARNING: Keep in mind that this is much more limitted than using the Elasticsearch Query DSL language, but it is an option that we have since elasticsearch version 7.
 
-References:
+## Exercises
+- Lab: open the Query Workbench and run some queries like the above.
+
+## References
 - [Basic Queries](https://opensearch.org/docs/latest/search-plugins/sql/sql/basic/)
 - [Metadata queries](https://opensearch.org/docs/latest/search-plugins/sql/sql/metadata/)
