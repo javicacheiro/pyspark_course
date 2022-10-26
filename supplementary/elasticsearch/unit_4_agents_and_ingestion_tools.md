@@ -7,16 +7,17 @@ Nowdays it is being replaced by more lightweight clients like `filebeat` and log
 ### Stdin input plugin
 The most basic plugin is the `stdin` input plugin that reads from stdin and converts each line in a document.
 
-Lab: [Creating documents from stdin](logstash/input_stdin.sh)
-- Upload the scripts with the configuration:
+Lab: [Creating documents from stdin](logstash/logstash_input_stdin.sh)
+- Edit the configuration scripts in the `bash` directory and upload them to you VM instance:
     ```
     scp -r bash cesgaxuser@opensearch-curso825:
     ```
-- Connect to the OpenSearch instance and copy the config to the
+- Connect to your OpenSearch instance and sync the config to the `/root` directory (if you change the files remember to sync the again):
     ```
     sudo rsync -av bash /root
     ```
-- Upload the script to your OpenSearch instance
+- Review the `logstash_input_stdin.sh` script, as you can see the documents will be added to an index named: `logstash-stdin-%{+YYYY.MM.dd}`
+- Upload the logstash script to your OpenSearch instance:
     ```
     scp logstash_input_stdin.sh cesgaxuser@opensearch-curso825:
     ```
@@ -24,11 +25,10 @@ Lab: [Creating documents from stdin](logstash/input_stdin.sh)
     ```
     sudo ./logstash_input_stdin.sh
     ```
-- Review the script, as you can see documents will be added to an index named: `logstash-stdin-%{+YYYY.MM.dd}`
-- Run the script and write some lines of text and then see how they appear in elasticsearch.
+- Wite some lines of text so you can see how they appear in elasticsearch.
 - Look at the inserted documents:
     ```
-    curl --insecure --user admin:admin -X GET "https://opensearch-curso825:9200/opensearch-logstash-test-$(date +%Y.%m.%d)/_search?pretty=true"
+    curl --insecure --user admin:admin -X GET "https://opensearch-curso825:9200/opensearch-logstash-stdin-$(date +%Y.%m.%d)/_search?pretty=true"
     ```
 
 You will see:
@@ -82,17 +82,18 @@ Reference:
 - [Stdin input plugin](https://www.elastic.co/guide/en/logstash/7.10/plugins-inputs-stdin.html)
 
 ### RSS input plugin
-Lab: [Consuming a RSS feed](logstash/input_rss.sh)
+Lab: [Consuming a RSS feed](logstash/logstash_input_rss.sh)
 
-- Upload the scripts with the configuration:
+- Edit the configuration scripts in the `bash` directory and upload them to you VM instance:
     ```
     scp -r bash cesgaxuser@opensearch-curso825:
     ```
-- Connect to the OpenSearch instance and copy the config to the
+- Connect to your OpenSearch instance and sync the config to the `/root` directory (if you change the files remember to sync the again):
     ```
     sudo rsync -av bash /root
     ```
-- Upload the logstash script to your OpenSearch instance
+- Review the `logstash_input_rss.sh` script, as you can see the documents will be added to an index named: `logstash-rss-%{+YYYY.MM.dd}`
+- Upload the logstash script to your OpenSearch instance:
     ```
     scp logstash_input_rss.sh cesgaxuser@opensearch-curso825:
     ```
@@ -100,8 +101,7 @@ Lab: [Consuming a RSS feed](logstash/input_rss.sh)
     ```
     sudo ./logstash_input_rss.sh
     ```
-- Review the script, as you can see documents will be added to an index named: `logstash-rss-%{+YYYY.MM.dd}`
-- Run the script and write some lines of text and then see how they appear in elasticsearch.
+- Wite some lines of text so you can see how they appear in elasticsearch.
 - Look at the inserted documents:
     ```
     curl --insecure --user admin:admin -X GET "https://opensearch-curso825:9200/logstash-rss-$(date +%Y.%m.%d)/_search?pretty=true"
@@ -167,7 +167,7 @@ Reference:
 - [RSS input plugin](https://www.elastic.co/guide/en/logstash/7.10/plugins-inputs-rss.html)
 
 ### Twitter input plugin
-Lab: [Consuming tweets](logstash/input_twitter.sh)
+Lab: [Consuming tweets](logstash/logstash_input_twitter.sh)
 
 NOTE: Unfortunately the `twitter` input plugin 7.x does not work with the new Twitter API v2 and the old one is not accessible any more for new accounts.
 Even the latest version of the `twitter` input plugin v4.1.0 does not support Twitter API v2.

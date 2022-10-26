@@ -112,6 +112,6 @@ print(response)
     ```
 
 - Lab: [Ingesting data from Twitter](exercises/twitter/twitter.md) 
- - Lab files are located in the `exercices/twitter` directory
+ - The files necessary for the lab are located in the `exercices/twitter` directory
 
 

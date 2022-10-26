@@ -87,4 +87,4 @@ Select a primary time field for use with the global time filter: `@timestamp`.
    - Type some queries using the Dashboards Query Language
    - Try also changing to Lucene query format
 - Lab: [Demo: Exploring OpenStack logs (why did this instance failed?)](exercises/kibana_exploring_openstack_logs.md)
-- Lab: [Ingest apache logs from bigdata web and explore them using filebeat pre-defined dashboard](exercises/kibana_apache_logs.md)
+- Lab: [Demo: Ingest apache logs from bigdata web and explore them using filebeat pre-defined dashboard](exercises/kibana_apache_logs.md)
