@@ -5,13 +5,13 @@ import re
 import json
 import pandas as pd
 
-INDEX_NAME = 'ratings'
-
-if len(sys.argv) != 3:
-    print('Please provide the name of the movies and ratings input files')
+if len(sys.argv) != 4:
+    print('Please provide the name of the movies and ratings input files and the index name')
+    print('For example: python3 convert_csv_to_bulk_format_ratings.py ratings.csv ratings.curso8XX')
 
 movies_filename = sys.argv[1]
 ratings_filename = sys.argv[2]
+indexname = sys.argv[3]
 
 # title contains the name of the film and the year
 # eg. Toy Story (1995)
@@ -32,7 +32,7 @@ for index, row in movies_df.iterrows():
         title = row['title']
         year = None
     genres = row['genres'].split('|')
-    create = {"create": {"_index": INDEX_NAME, "_id": movieId}}
+    create = {"create": {"_index": indexname, "_id": movieId}}
     movies[movieId] = {"movieId": movieId, "title": title, "year": year, "genres": genres}
 
 for index, row in ratings_df.iterrows():
@@ -40,7 +40,7 @@ for index, row in ratings_df.iterrows():
     movieId = int(row['movieId'])
     rating = int(row['rating'])
     timestamp = int(row['timestamp'])
-    create = {"create": {"_index": INDEX_NAME, "_id": f"{userId}-{movieId}"}}
+    create = {"create": {"_index": indexname, "_id": f"{userId}-{movieId}"}}
     rating = {
         "userId": userId,
         "movieId": movieId,
