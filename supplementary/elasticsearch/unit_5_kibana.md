@@ -23,9 +23,9 @@ You create it under `Management > Stack Management: Index patterns`.
 
 There you press the button "Create index pattern" and you give the `index patter name`, for example `movies*` then you press next and, if you have a `primary time field` in your documents you can indicate it in the second step.
 
-![Kibana create index 1](http://bigdata.cesga.es/img/kibana_create_index_1.png)
+![Kibana create index 1](http://bigdata.cesga.es/img/kibana_create_index_pattern_1.png)
 
-![Kibana create index 2](http://bigdata.cesga.es/img/kibana_create_index_2.png)
+![Kibana create index 2](http://bigdata.cesga.es/img/kibana_create_index_pattern_2.png)
 
 After doing this you will be able to select `movies*` in the Discover view and start exploring the data.
 
