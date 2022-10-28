@@ -234,44 +234,51 @@ def etl_taskflow_api():
 etl_taskflow_api()
 ```
 
+NOTE:
+- Setting `multiple_outputs=True` unrolls dictionaries, lists or tuples into separate XCom values. As an alternative, using the typing `Dict` for the function return type, the `multiple_outputs` parameter is automatically set to true.
+```python
+    @task()
+    def transform(order_data_dict: dict) -> Dict[str, float]:
+        total_order_value = 0
+        for value in order_data_dict.values():
+            total_order_value += value
+        return {"total_order_value": total_order_value}
+```
+
 ### Accessing context variables
 In the new TaskFlow API there are different ways of accessing context variables.
 
 - With explicit arguments (recommended). Just remember to set them as optional arguments with the default value None.
-```python
-@task
-def my_task(execution_date=None, next_ds=None):
-    print(execution_date, next_ds)
-```
-
+    ```python
+    @task
+    def my_task(execution_date=None, next_ds=None):
+        print(execution_date, next_ds)
+    ```
 - With `kwargs`:
-```python
-@task
-def my_task(**kwargs):
-    execution_date = kwargs["execution_date"]
-    next_ds = kwargs["next_ds"]
-    print(execution_date, next_ds)
-```
-I would recommend to rename `kwargs` as `context`:
-```python
-@task
-def my_task(**context):
-    execution_date = context["execution_date"]
-    next_ds = context["next_ds"]
-    print(execution_date, next_ds)
-```
-
-- With `get_current_context`. This can be used also in pure python functions that are not decored as `@task`:
-```python
-from airflow.operators.python import get_current_context
-
-
-def my_task():
-    context = get_current_context()
-    execution_date = context["execution_date"]
-    next_ds = context["next_ds"]
-    print(execution_date, next_ds)
-```
+    ```python
+    @task
+    def my_task(**kwargs):
+        execution_date = kwargs["execution_date"]
+        next_ds = kwargs["next_ds"]
+        print(execution_date, next_ds)
+    ```
+    I would recommend to rename `kwargs` as `context`:
+    ```python
+    @task
+    def my_task(**context):
+        execution_date = context["execution_date"]
+        next_ds = context["next_ds"]
+        print(execution_date, next_ds)
+    ```
+- With `get_current_context`. This can be used also in pure python functions that are not decorated as `@task`:
+    ```python
+    from airflow.operators.python import get_current_context
+    def my_task():
+        context = get_current_context()
+        execution_date = context["execution_date"]
+        next_ds = context["next_ds"]
+        print(execution_date, next_ds)
+    ```
 
 ### Combining TaskFlow tasks with traditional tasks
 We can instantiate any `decorated task` created with the TaskFlow API and then use it as if it was a `traditional task`. This way we can combine it with any traditional tasks created from operators:
@@ -382,15 +389,13 @@ We can use the python `strftime` method to convert them to the format we need in
 execution_date.strftime('%d-%m-%Y')
 ```
 or by using the following shortcuts:
-```
-ds: execution_date formated as YYYY-MM-DD
-ds_nodash: execution_date formated as YYYYMMDD
-next_ds: execution_date formated as YYYY-MM-DD
-next_ds_nodash: execution_date formated as YYYYMMDD
-execution_date.day
-execution_date.month
-execution_date.year
-```
+- `ds`: execution_date formated as YYYY-MM-DD
+- `ds_nodash`: execution_date formated as YYYYMMDD
+- `next_ds`: execution_date formated as YYYY-MM-DD
+- `next_ds_nodash`: execution_date formated as YYYYMMDD
+- `execution_date.day`
+- `execution_date.month`
+- `execution_date.year`
 
 ## Backfilling
 Airflow allows to define a `start_date` in the past for our DAG. This way it will run our DAG passing previous execution dates until it catches with the current time, this way it will load and analyze past data. This feature is called `backfilling`.
@@ -540,7 +545,7 @@ airflow dags list-import-errors
 
 ## Exercises
 - Lab 0: [Airflow installation](exercises/airflow_installation.md)
-- Lab 1: [Simple DAG using BashOperator](exercices/dag_using_operators.py)
+- Lab 1: [Simple DAG using BashOperator](exercises/dag_using_operators.py)
 - Lab 2: ETL
  - Creating a simple ETL with the classic API: [ETL Classic API](exercises/etl_classic_api.py)
  - Creating a simple ETL with the TaskFlow API: [ETL TaskFlow API](exercises/etl_taskflow_api.py)
@@ -553,18 +558,18 @@ airflow dags list-import-errors
   - [Remote run DAG](exercises/remote_run_dag.py)
 - Lab 5: How to use context variables like `execution_date` to define DAGs
   - [wikimedia download using bashoperator](exercises/wikimedia_download_bashoperator.py)
-      NOTE: In this case we will trigger the DAG from the web interface with the "Trigger DAG w/ config" option
-      and there we will indicate the logical date in the time box.
-      Alternatively from the CLI so we can also specify a `execution_date` in the past:
+      - We will trigger the DAG with an `execution_date` in the past
+      - To do that trigger the DAG from the web interface with the `Trigger DAG w/ config` option and there we will indicate the logical date in the time box.
+      - Alternatively,  from the CLI, we can also specify an `execution_date` in the past:
       ```
       ./airflow.sh dags trigger -e '2022-10-10T12:00:00' wikimedia_download_bashoperator
       ```
       this is due to the fact that wikimedia pageviews sometimes are delayed up to 2 hours.
   - [wikimedia download using pure python](exercises/wikimedia_download_pure_python.py)
-      NOTE: In this second example we do the trick directly in the python code
+      - In this second example we do the trick directly in the python code
 - Lab 6: [Creating a data pipeline](exercises/creating_a_data_pipeline.md)
   - [Wikimedia pagecounts data pipeline that uses Spark for processing](exercises/wikimedia_data_pipeline.py)
-  - [Spark Application to process wikimedia data](exercices/process_wikimedia_pagecounts.py)
+  - [Spark Application to process wikimedia data](exercises/process_wikimedia_pagecounts.py)
 
 ## References
 - [Fundamental Concepts](https://airflow.apache.org/docs/apache-airflow/stable/tutorial/fundamentals.html)
