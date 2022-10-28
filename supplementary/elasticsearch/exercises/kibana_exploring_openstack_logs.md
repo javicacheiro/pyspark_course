@@ -62,7 +62,7 @@ Select the fields:
 
 We can see that there are messages related to this instance expanding from 16:35 to 16:44 on Oct 13.
 
-![Demo vm failure 1](kibana_demo_openstack_vm_failure_1.png)
+![Demo vm failure 1](http://bigdata.cesga.es/img/kibana_demo_openstack_vm_failure_1.png)
 
 Scrolling we can see that there are different host involved in the creation of the VM and we can see the timeline of events.
 
@@ -71,7 +71,7 @@ We can restrict the results keeping only the error lines:
 message:"d892d127-6381-4f17-a019-7581c3bf10ad" and message:error
 ```
 
-![Demo vm failure 2](kibana_demo_openstack_vm_failure_2.png)
+![Demo vm failure 2](http://bigdata.cesga.es/img/kibana_demo_openstack_vm_failure_2.png)
 
 And we can see that the follong message in c27-20:
 ```
