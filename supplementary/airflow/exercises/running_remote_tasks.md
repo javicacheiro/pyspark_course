@@ -4,17 +4,24 @@ To run remote tasks we can use a remote Airflow worker that is deployed in the n
 But there are times where we can not deploy software in the remote system or we prefer no to do it. In this case we can use the procedure that we will explore in this lab that **requires only SSH access to the remote system**.
 
 ## Setting up the connection to the remote system
-First we will create a pair of SSH keys in the airflow machine that runs the executor:
+First we will create a pair of SSH keys in the airflow machine:
 ```
 ssh-keygen -t rsa
 ```
 
-Then we will use this key to authorise logins on the remote servers we want to connect to:
+Then we will copy them to the host that runs the executor (airflow-worker):
+```
+docker cp ~/.ssh cesgaxuser-airflow-worker-1:/home/airflow/.ssh
+```
+
+Finally we will grant access to the remote servers we want to connect to:
 ```
 ssh-copy-id curso800@hadoop.cesga.es
 ```
 
 We will repeat the last step for each of the remote servers we will be running tasks on.
+
+
 
 ## Running remote tasks
 The to run remote tasks we will make use of the `run` method in our `helpers.py` module:
