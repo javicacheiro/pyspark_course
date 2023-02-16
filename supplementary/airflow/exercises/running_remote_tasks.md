@@ -8,10 +8,10 @@ First we will create a pair of SSH keys in the airflow machine:
 ```
 ssh-keygen -t rsa
 ```
-
-Then we will copy them to the host that runs the executor (airflow-worker):
+Then we will copy the private key to the `dags/keys` directory where the `run` function will look for it:
 ```
-docker cp ~/.ssh cesgaxuser-airflow-worker-1:/home/airflow/.ssh
+mkdir ~/dags/keys
+cp -a ~/.ssh/ir_rsa ~/dags/keys
 ```
 
 Finally we will grant access to the remote servers we want to connect to:
@@ -21,7 +21,7 @@ ssh-copy-id curso800@hadoop.cesga.es
 
 We will repeat the last step for each of the remote servers we will be running tasks on.
 
-
+Notice that the commands are launched from the container that runs the executor (airflow-worker) not from the host.
 
 ## Running remote tasks
 The to run remote tasks we will make use of the `run` method in our `helpers.py` module:
