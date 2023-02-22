@@ -5,13 +5,13 @@ from helpers import run
 from airflow.hooks.base import BaseHook
 import requests
 
-SLACK_CONN_ID = 'slack_cesga_monitoring'
+SLACK_CONN_ID = 'slack_cesga_monitoring_alerts'
 
 def slack_alert(context):
     host = 'https://hooks.slack.com/services/'
     token = BaseHook.get_connection(SLACK_CONN_ID).password
     slack_webhook_url = host + token
-    message = ':red_circle: Posible problema no Lustre scratch (LUSTREP nlsas).'
+    message = ':red_circle: Posible problema no Lustre scratch.'
     requests.post(slack_webhook_url, json={"text": str(message)})
 
 
