@@ -53,18 +53,18 @@ java -version
 
 Download & Install Spark:
 ```
-curl -L -O https://dlcdn.apache.org/spark/spark-3.3.0/spark-3.3.0-bin-hadoop3.tgz
-tar xzvf spark-3.3.0-bin-hadoop3.tgz
+curl -L -O https://dlcdn.apache.org/spark/spark-3.3.2/spark-3.3.2-bin-hadoop3.tgz
+tar xzvf spark-3.3.2-bin-hadoop3.tgz
 ```
 
 On the master node execute:
 ```
-spark-3.3.0-bin-hadoop3/sbin/start-master.sh
+spark-3.3.2-bin-hadoop3/sbin/start-master.sh
 ```
 
 Look at the log to verify everything run correctly and check the spark master url:
 ```
-tail spark-3.3.0-bin-hadoop3/logs/spark-cesgaxuser-org.apache.spark.deploy.master.Master-1-spark-1.novalocal.out
+tail spark-3.3.2-bin-hadoop3/logs/spark-cesgaxuser-org.apache.spark.deploy.master.Master-1-spark-1.novalocal.out
 ```
 
 You should see something like:
@@ -78,12 +78,12 @@ as you can see, in this case, the master url is: spark://spark-1.novalocal:7077
 
 Now we can start each of the workers (one in each additional node: spark-[2-4]):
 ```
-spark-3.3.0-bin-hadoop3/sbin/start-worker.sh spark://spark-1.novalocal:7077
+spark-3.3.2-bin-hadoop3/sbin/start-worker.sh spark://spark-1.novalocal:7077
 ```
 
 Look at the log to verify everything run fine:
 ```
-tail spark-3.3.0-bin-hadoop3/logs/spark-cesgaxuser-org.apache.spark.deploy.worker.Worker-1-spark-2.novalocal.out
+tail spark-3.3.2-bin-hadoop3/logs/spark-cesgaxuser-org.apache.spark.deploy.worker.Worker-1-spark-2.novalocal.out
 ```
 
 Connect to the Master UI at:
@@ -101,7 +101,7 @@ NOTE: Spark 3.3.0 supports Python 3.7 and above.
 
 Then to start a pyspark session just run:
 ```
-spark-3.3.0-bin-hadoop3/bin/pyspark --master spark://spark-1.novalocal:7077
+spark-3.3.2-bin-hadoop3/bin/pyspark --master spark://spark-1.novalocal:7077
 
 >>> rdd = sc.parallelize(range(120), 6)
 >>> rdd.pipe('/bin/hostname').collect()
@@ -110,7 +110,7 @@ spark-3.3.0-bin-hadoop3/bin/pyspark --master spark://spark-1.novalocal:7077
 ## spark-defaults.conf
 We can also tune the configuration:
 ```
-cp spark-3.3.0-bin-hadoop3/conf/spark-defaults.conf.template spark-3.3.0-bin-hadoop3/conf/spark-defaults.conf
+cp spark-3.3.2-bin-hadoop3/conf/spark-defaults.conf.template spark-3.3.2-bin-hadoop3/conf/spark-defaults.conf
 ```
 Edit spark-defaults.conf and set:
 ```
@@ -119,7 +119,7 @@ spark.master spark://spark-1.novalocal:7077
 
 Now you can start pyspark omitting the master url:
 ```
-spark-3.3.0-bin-hadoop3/bin/pyspark
+spark-3.3.2-bin-hadoop3/bin/pyspark
 ```
 
 ## Reference
