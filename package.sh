@@ -1,7 +1,6 @@
 #!/bin/bash
 TMPDIR=$(mktemp -d)
-mkdir $TMPDIR/notebooks
-cp -a ../pyspark_course/README.md ../pyspark_course/*.ipynb ../pyspark_course/exercises/ ../pyspark_course/solutions/ $TMPDIR/notebooks
+git clone --depth=1 git@github.com:javicacheiro/pyspark_course.git $TMPDIR/notebooks
 cd $TMPDIR
 tar czvf notebooks.tar.gz notebooks
 
