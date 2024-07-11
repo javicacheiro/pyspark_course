@@ -1,0 +1,36 @@
+
+== Running original KMeans implementation ==
+24/07/11 19:49:15 WARN util.Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
+24/07/11 19:49:15 WARN util.Utils: Service 'SparkUI' could not bind on port 4041. Attempting port 4042.
+24/07/11 19:49:15 WARN util.Utils: Service 'SparkUI' could not bind on port 4042. Attempting port 4043.
+24/07/11 19:49:15 WARN util.Utils: Service 'SparkUI' could not bind on port 4043. Attempting port 4044.
+Variation in iteration 0: 4989.32008451
+Variation in iteration 1: 2081.17551268
+Variation in iteration 2: 1.6011620119
+Variation in iteration 3: 2.55059475168
+Variation in iteration 4: 0.994848416636
+Variation in iteration 5: 0.0381850235415
+Final centroids: [(35.08592000544936, -112.57643826547803), (0.0, 0.0), (38.05200414101911, -121.20324355675143), (43.891507710205694, -121.32350131512835), (34.28939789970032, -117.77840744773651)]
+Elapsed time: 57.1433608532
+
+real	0m59.923s
+user	0m12.259s
+sys	0m1.067s
+
+== Running optimized KMeans implementation ==
+24/07/11 19:50:15 WARN util.Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
+24/07/11 19:50:15 WARN util.Utils: Service 'SparkUI' could not bind on port 4041. Attempting port 4042.
+24/07/11 19:50:15 WARN util.Utils: Service 'SparkUI' could not bind on port 4042. Attempting port 4043.
+24/07/11 19:50:15 WARN util.Utils: Service 'SparkUI' could not bind on port 4043. Attempting port 4044.
+Variation in iteration 0: 4989.32008451
+Variation in iteration 1: 2081.17551268
+Variation in iteration 2: 1.6011620119
+Variation in iteration 3: 2.55059475168
+Variation in iteration 4: 0.994848416636
+Variation in iteration 5: 0.0381850235415
+Final centroids: [[35.08592000544936, -112.57643826547803], [0.0, 0.0], [38.05200414101911, -121.20324355675143], [43.891507710205694, -121.32350131512835], [34.28939789970032, -117.77840744773651]]
+Elapsed time: 22.1316897869
+
+real	0m24.894s
+user	0m12.667s
+sys	0m0.962s
