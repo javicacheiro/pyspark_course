@@ -130,7 +130,6 @@ sudo mkdir /data/kraft-combined-logs
 sudo chown $USER /data/kraft-combined-logs
 ```
 
-#### KRaft
 Configure KRaft data storage directory editting `config/kraft/server.properties`:
 ```config/kraft/server.properties
 log.dirs=/data/kraft-combined-logs
@@ -160,6 +159,11 @@ Start kafka broker:
 If everything went fine (ie. no errors) run it in daemon mode:
 ```
 ./bin/kafka-server-start.sh -daemon config/kraft/server.properties
+```
+
+We can see that only the Kafka process is running and no Zookeeper server is needed:
+```
+jps
 ```
 
 Logs are in:
@@ -222,6 +226,11 @@ Start kafka broker:
 If everything went fine (ie. no errors) run it in daemon mode:
 ```
 ./bin/kafka-server-start.sh -daemon config/server.properties
+```
+
+At this point we will have two processed running Zookeeper and Kafka, we can verify that with:
+```
+jps
 ```
 
 Logs are in:
