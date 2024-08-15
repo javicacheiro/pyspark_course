@@ -1,7 +1,7 @@
 """Producer using confluent-kafka module
 
 Reads configuration from the following environmental variables:
-    - KAFKA_BROKER: Kafka Broker, it can include port eg. "10.38.28.103:9092"
+    - BROKER: Kafka Broker, it can include port eg. "10.38.28.103:9092"
 
 You can store the configuration variables in a file and then load them:
 
@@ -23,7 +23,7 @@ import json
 import os
 
 
-broker = os.environ['KAFKA_BROKER']
+broker = os.environ['BROKER']
 
 conf = {'bootstrap.servers': broker, 'client.id': socket.gethostname()}
 
