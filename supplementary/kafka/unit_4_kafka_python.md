@@ -20,9 +20,8 @@ conda install -c conda-forge -y kafka-python
 
 In our case both modules are available loading:
 ```
-module load anaconda3/2022.05
+module load anaconda3/2024.02-1
 ```
-
 
 ## Initialization
 ```python
