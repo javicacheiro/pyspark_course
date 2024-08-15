@@ -36,7 +36,7 @@ kafka-console-producer.sh --bootstrap-server $BROKER --topic lab1.cursoXXX --pro
 >key1:my first message
 >key2:my second message
 ```
-To exit the console producer type: `Ctrl+d`
+To exit the console producer gracefully type: `Ctrl+d`
 
 ## Start the console consumer
 We will start a console consumer and we will configure it to show the messages from the beginning and to display also the keys:
