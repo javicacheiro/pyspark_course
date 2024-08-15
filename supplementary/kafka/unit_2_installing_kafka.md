@@ -144,7 +144,7 @@ bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c config/kraft/server.properti
 
 Check the IP address of the host:
 ```
-ip address show
+hostname -i
 ```
 
 Configure kafka broker to advertise this address to clients instead of its hostname (external clients would not be able to resolve it):
