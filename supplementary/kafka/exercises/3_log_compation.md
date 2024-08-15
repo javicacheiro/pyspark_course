@@ -4,7 +4,7 @@ Log compaction is a mechanism to give finer-grained per-record retention, rather
 Basically what this means is that, for a given message key, Kafka will remove any old messages that have a newer version of it with the same key in the partition log. 
 
 ## Setup
-Add the corresponding kafka version tools to the `PATH` and set the `BROKER` address of the cluster:
+Start two consoles and setup them adding the corresponding kafka version tools to the `PATH` and setting the `BROKER` address of the cluster:
 ```
 export PATH="/opt/cesga/kafka/kafka_2.13-3.7.1/bin:$PATH"
 export BROKER="10.133.29.20:9092"
