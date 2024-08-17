@@ -44,9 +44,9 @@ To receive acknowledgements:
 ```python
 def acked(err, msg):
     if err is not None:
-        print("Failed to deliver message: %s: %s" % (str(msg), str(err)))
+        print(f"Failed to deliver message: {msg}: {err}")
     else:
-        print("Message produced: %s" % (str(msg)))
+        print(f"Message produced: {msg}")
 
 producer.produce(topic, key="key", value="value", callback=acked)
 
@@ -65,7 +65,7 @@ producer.flush()
 # Kafka Consumer
 ## Initialization
 ```python
-from confluent_kafka import Producer
+from confluent_kafka import Consumer
 
 conf = {'bootstrap.servers': "host1:9092,host2:9092",
         'group.id': "consumer_group_name"}
@@ -74,128 +74,123 @@ consumer = Consumer(conf)
 ```
 ## Basic poll loop
 ```python
-running = True
-
-def basic_consume_loop(consumer, topics):
-    try:
-        consumer.subscribe(topics)
-
-        while running:
-            msg = consumer.poll(timeout=1.0)
-            if msg is None: continue
-
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    # End of partition event
-                    sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
-                                     (msg.topic(), msg.partition(), msg.offset()))
-                elif msg.error():
-                    raise KafkaException(msg.error())
+try:
+    consumer.subscribe(['topic1', 'topic2'])
+    while True:
+        msg = consumer.poll(timeout=1.0)
+        if msg is None: continue
+        if msg.error():
+            if msg.error().code() == KafkaError._PARTITION_EOF:
+                # End of partition event
+                print(f'%% {msg.topic} [{msg.partition}] reached end at offset {msg.offset}\n')
             else:
-                msg_process(msg)
-    finally:
-        # Close down consumer to commit final offsets.
-        consumer.close()
-
-def shutdown():
-    running = False
+                raise KafkaException(msg.error())
+        else:
+            print(msg.key(), msg.value())
+finally:
+    # Close down consumer to commit final offsets.
+    consumer.close()
 ```
 
 ## Synchronous commits
 The simplest and most reliable way to manually commit offsets is by setting the asynchronous parameter to the Consumer.commit() method call.
 ```python
-def consume_loop(consumer, topics):
-    try:
-        consumer.subscribe(topics)
-
-        msg_count = 0
-        while running:
-            msg = consumer.poll(timeout=1.0)
-            if msg is None: continue
-
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    # End of partition event
-                    sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
-                                     (msg.topic(), msg.partition(), msg.offset()))
-                elif msg.error():
-                    raise KafkaException(msg.error())
+# Commit at least every 10 messages
+MIN_COMMIT_COUNT = 10
+try:
+    consumer.subscribe(['topic1', 'topic2'])
+    count = 0
+    while True:
+        msg = consumer.poll(timeout=1.0)
+        if msg is None: continue
+        if msg.error():
+            if msg.error().code() == KafkaError._PARTITION_EOF:
+                # End of partition event
+                print(f'%% {msg.topic} [{msg.partition}] reached end at offset {msg.offset}\n')
             else:
-                msg_process(msg)
-                msg_count += 1
-                if msg_count % MIN_COMMIT_COUNT == 0:
-                    consumer.commit(asynchronous=False)
-    finally:
-        # Close down consumer to commit final offsets.
-        consumer.close()
+                raise KafkaException(msg.error())
+        else:
+            process_message(msg)
+            count += 1
+            if count % MIN_COMMIT_COUNT == 0:
+                consumer.commit(asynchronous=False)
+finally:
+    consumer.close()
 ```
-A synchronous commit is triggered every MIN_COMMIT_COUNT messages. The asynchronous flag controls whether this call is asynchronous. You could also trigger the commit on expiration of a timeout to ensure there the committed position is updated regularly.
+A synchronous commit is triggered every MIN_COMMIT_COUNT messages. The asynchronous flag controls whether this call is asynchronous. You could also trigger the commit on expiration of a timeout to ensure the committed position is updated regularly.
 
 ## Delivery guarantees
-In the previous example, you get “at least once” delivery since the commit follows the message processing. By changing the order, however, you can get “at most once” delivery, but you must be a little careful with the commit failure.
+In the previous example, you get **at least once** delivery since the commit follows the message processing. By changing the order, however, you can get **at most once** delivery, but you must be a little careful if there is a commit failure.
 ```python
-def consume_loop(consumer, topics):
-    try:
-        consumer.subscribe(topics)
-
-        while running:
-            msg = consumer.poll(timeout=1.0)
-            if msg is None: continue
-
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    # End of partition event
-                    sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
-                                     (msg.topic(), msg.partition(), msg.offset()))
-                elif msg.error():
-                    raise KafkaException(msg.error())
+try:
+    consumer.subscribe(['topic1', 'topic2'])
+    count = 0
+    while True:
+        msg = consumer.poll(timeout=1.0)
+        if msg is None: continue
+        if msg.error():
+            if msg.error().code() == KafkaError._PARTITION_EOF:
+                # End of partition event
+                print(f'%% {msg.topic} [{msg.partition}] reached end at offset {msg.offset}\n')
             else:
-                consumer.commit(asynchronous=False)
-                msg_process(msg)
-
-    finally:
-        # Close down consumer to commit final offsets.
-        consumer.close()
+                raise KafkaException(msg.error())
+        else:
+            consumer.commit(asynchronous=False)
+            process_message(msg)
+finally:
+    consumer.close()
 ```
 
-For simplicity in this example, Consumer.commit() is used prior to processing the message. Committing on every message would produce a lot of overhead in practice. A better approach would be to collect a batch of messages, execute the synchronous commit, and then process the messages only if the commit succeeded.
+Committing on every message would produce a lot of overhead in practice. A better approach would be to collect a batch of messages, execute the synchronous commit, and then process the messages only if the commit succeeded.
 
 ## Asynchronous Commits
-In this example, the consumer sends the request and returns immediately by using asynchronous commits.
+In this example, the consumer sends the request and returns immediately by using asynchronous commits. In this case we also batch the messages.
 ```python
-def consume_loop(consumer, topics):
-    try:
-        consumer.subscribe(topics)
-
-        msg_count = 0
-        while running:
-            msg = consumer.poll(timeout=1.0)
-            if msg is None: continue
-
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    # End of partition event
-                    sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
-                                     (msg.topic(), msg.partition(), msg.offset()))
-                elif msg.error():
-                    raise KafkaException(msg.error())
+# Commit at least every 10 messages
+MIN_COMMIT_COUNT = 10
+try:
+    consumer.subscribe(['topic1', 'topic2'])
+    count = 0
+    while True:
+        msg = consumer.poll(timeout=1.0)
+        if msg is None: continue
+        if msg.error():
+            if msg.error().code() == KafkaError._PARTITION_EOF:
+                # End of partition event
+                print(f'%% {msg.topic} [{msg.partition}] reached end at offset {msg.offset}\n')
             else:
-                msg_process(msg)
-                msg_count += 1
-                if msg_count % MIN_COMMIT_COUNT == 0:
-                    consumer.commit(asynchronous=True)
-    finally:
-        # Close down consumer to commit final offsets.
-        consumer.close()
+                raise KafkaException(msg.error())
+        else:
+            process_message(msg)
+            count += 1
+            if count % MIN_COMMIT_COUNT == 0:
+                consumer.commit(asynchronous=True)
+finally:
+    consumer.close()
 ```
 
-## Examples
-- [Producer using Confluent Kafka](producer_using_confluent_kafka.py)
-- [Producer using kafka-python](producer_using_kafka-python.py)
-- [Producer using kafka-python: sending JSON](producer_using_kafka-python_json.py)
-- [Consumer using Confluent Kafka](consumer_using_confluent_kafka.py)
-- [Consumer using kafka-python](consumer_using_kafka-python.py)
-- [Consumer using kafka-python: sending JSON](consumer_using_kafka-python_json.py)
+## Exercises
+Review the code and each of the following examples:
+- [Producer using Confluent Kafka](exercises/producer_using_confluent_kafka.py)
+- [Producer using kafka-python](exercises/producer_using_kafka-python.py)
+- [Producer using kafka-python: sending JSON using value_serializer](exercises/producer_using_kafka-python_json.py)
+- [Consumer using Confluent Kafka](exercises/consumer_using_confluent_kafka.py)
+- [Consumer using kafka-python](exercises/consumer_using_kafka-python.py)
+- [Consumer using kafka-python: consuming JSON using value_deserializer](exercises/consumer_using_kafka-python_json.py)
+
+Remember to load the anaconda3 module that provides access to both kafka-python and confluent kafka:
+```
+module load anaconda3/2024.02-1
+```
+The examples read the `BROKER` and `TOPIC` information from the environment, so remember to set them accordingly to your setup:
+```
+export BROKER="10.133.29.20:9092"
+export TOPIC="test.cursoXXX"
+```
+You can use kafka tools to see the messages that are being published or to produce new messages.
+```
+module load kafka/3.7.1
+```
 
 ## References
 - [Confluent Kafka Python Client](https://docs.confluent.io/kafka-clients/python/current/overview.html)
