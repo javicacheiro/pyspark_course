@@ -52,7 +52,7 @@ For example you can use the provided example spark streaming consumer job that c
 ```
 export BROKER="10.133.29.20:9092"
 export TOPIC="lab2.cursoXXX"
-spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.0 spark_kafka_example.py
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.0 exercises/spark_kafka_example.py
 ```
 
 ## Using Kafka from Spark 3.4.3
@@ -115,7 +115,7 @@ For example you can use the provided example spark streaming consumer job that c
 module load spark/3.4.3
 export BROKER="10.133.29.20:9092"
 export TOPIC="lab2.cursoXXX"
-spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.3 spark_kafka_example.py
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.3 exercises/spark_kafka_example.py
 ```
 
 ## References
