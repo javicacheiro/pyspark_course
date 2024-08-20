@@ -5,6 +5,7 @@ Reads streaming data from a rate source
 """
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, explode, split, expr
+from pyspark.sql.functions import spark_partition_id
 
 if __name__ == "__main__":
 
@@ -25,9 +26,11 @@ if __name__ == "__main__":
     df.printSchema()
 
     # Transform
+    df_with_partition_id = df.withColumn('partition', spark_partition_id())
+
 
     # Sink
-    query = df.writeStream \
+    query = df_with_partition_id.writeStream \
         .format('console') \
         .option('truncate', 'false') \
         .outputMode('update') \
