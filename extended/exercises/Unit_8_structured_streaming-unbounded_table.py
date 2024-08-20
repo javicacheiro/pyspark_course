@@ -15,8 +15,7 @@ where <port> is the port where you want netcat to listen.
 
 To submit the application use:
 
-    module load anaconda3
-    spark-submit Unit_8_spark_streaming-unbounded_table.py <hostname> <port>
+    spark-submit Unit_8_structured_streaming-unbounded_table.py <hostname> <port>
 
 where <hostname> and <port> are the address and port of the TCP socket.
 """
@@ -26,16 +25,16 @@ import sys
 
 def parse_args():
     if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <hostname> <port>")
+        print("Usage: {} <hostname> <port>".format(sys.argv[0]))
         sys.exit(1)
     return (sys.argv[1], int(sys.argv[2]))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     host, port = parse_args()
 
     spark = SparkSession.builder \
-        .appName("StructuredStreamingUnboundedTable") \
+        .appName('StructuredStreamingUnboundedTable') \
         .config('spark.dynamicAllocation.enabled', False) \
         .getOrCreate()
 
