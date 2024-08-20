@@ -9,7 +9,7 @@ from pyspark.sql.functions import col, explode, split, expr
 if __name__ == "__main__":
 
     spark = SparkSession.builder \
-        .appName('StreamingFromFile') \
+        .appName('StreamingFromRateSource') \
         .config('spark.sql.shuffle.partitions', 3) \
         .config('spark.streaming.stopGracefullyOnShutdown', 'true') \
         .config('spark.sql.streaming.schemaInference', 'true') \
