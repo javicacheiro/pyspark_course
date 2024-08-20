@@ -17,7 +17,6 @@ where <port> is the port where you want netcat to listen.
 
 To submit the application use:
 
-    module load anaconda3
     spark-submit Unit_8_socket_wordcount.py <hostname> <port>
 
 where <hostname> and <port> are the address and port of the TCP socket.
@@ -38,8 +37,7 @@ if __name__ == "__main__":
 
     spark = SparkSession.builder \
         .appName('StreamingWordCount') \
-        .config("spark.sql.shuffle.partitions", 3) \
-        .config("spark.streaming.stopGracefullyOnShutdown", "true") \
+        .config('spark.streaming.stopGracefullyOnShutdown', 'true') \
         .getOrCreate()
 
     # Each input line read from the stream is mapped to a row in the DataFrame
