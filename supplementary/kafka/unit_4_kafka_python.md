@@ -3,7 +3,7 @@
 # Kakfa Producer
 ## Module installation
 The official module is provided by Confluent, you can install it with conda or with pip, but it requires compilation:
-```
+```bash
 # Using conda
 conda install -c conda-forge python-confluent-kafka
 # Using pip (requires compilation)
@@ -11,7 +11,7 @@ pip install confluent-kafka
 ```
 
 Another alternative, simpler to use, is the [kafka-python](https://github.com/dpkp/kafka-python) module:
-```
+```bash
 # Using pip
 pip install kafka-python
 # Using conda
@@ -19,7 +19,7 @@ conda install -c conda-forge -y kafka-python
 ```
 
 In our case both modules are available loading:
-```
+```bash
 module load anaconda3/2024.02-1
 ```
 
