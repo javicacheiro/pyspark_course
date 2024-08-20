@@ -2,7 +2,7 @@
 
 Reads configuration from the following environmental variables:
     - TWITTER_BEARER_TOKEN: Twitter bearer token
-    - KAFKA_BROKER: Kafka Broker, it can include port eg. "10.38.28.103:9092"
+    - BROKER: Kafka Broker, it can include port eg. "10.38.28.103:9092"
 
 You can store the configuration variables in a file and then load them:
 
@@ -19,9 +19,9 @@ import json
 import os
 
 bearer_token = os.environ['TWITTER_BEARER_TOKEN']
-broker = os.environ['KAFKA_BROKER']
+broker = os.environ['BROKER']
 
-producer = KafkaProducer(bootstrap_servers='10.38.28.103:9092',
+producer = KafkaProducer(bootstrap_servers=broker,
                          value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
 
