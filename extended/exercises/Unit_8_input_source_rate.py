@@ -29,6 +29,7 @@ if __name__ == "__main__":
     # Sink
     query = df.writeStream \
         .format('console') \
+        .option('truncate', 'false') \
         .outputMode('update') \
         .start()
 
