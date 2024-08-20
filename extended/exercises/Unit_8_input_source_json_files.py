@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # Sink
     query = df.writeStream \
         .format('console') \
-        .outputMode('complete') \
+        .outputMode('update') \
         .start()
 
     query.awaitTermination()
