@@ -1,7 +1,22 @@
+"""Order Processor
+
+Streaming app that processes orders received from the "orders.curso800" topic
+and generates manufacturing requests in the "manufacturing.curso800" topic
+
+Reads configuration from the following environmental variables:
+    - BROKER: Kafka Broker, it can include port eg. "10.38.28.103:9092"
+
+It reads orders from the "orders.curso800" topic and it writes manufacturing requests
+in the "manufacturing.curso800" topic.
+"""
 from __future__ import print_function
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json, expr, to_json
 from  pyspark.sql.types import StructType, StructField, LongType, StringType, ArrayType
+import os
+
+broker = os.environ['BROKER']
+
 
 if __name__ == "__main__":
     spark = SparkSession \
@@ -23,8 +38,8 @@ if __name__ == "__main__":
     #raw = spark.read \
     raw = spark.readStream \
         .format("kafka") \
-        .option("kafka.bootstrap.servers", "10.38.28.103:9092") \
-        .option("subscribe", "orders") \
+        .option("kafka.bootstrap.servers", broker) \
+        .option("subscribe", "orders.curso800") \
         .option("startingOffsets", "earliest") \
         .load()
 
@@ -88,13 +103,12 @@ if __name__ == "__main__":
 
     product_writer = kafka_df.writeStream \
         .format("kafka") \
-        .option("kafka.bootstrap.servers", "10.38.28.103:9092") \
-        .option("topic", "manufacturing") \
+        .option("kafka.bootstrap.servers", broker) \
+        .option("topic", "manufacturing.curso800") \
         .queryName("MyProducts") \
         .outputMode("append") \
         .option("checkpointLocation", "orders_checkpoint_dir") \
         .trigger(processingTime="5 seconds") \
         .start()
-
 
     product_writer.awaitTermination()

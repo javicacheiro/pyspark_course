@@ -1,7 +1,19 @@
+"""Streaming app: read order data from a kafka topic using a sliding window
+
+Reads configuration from the following environmental variables:
+    - BROKER: Kafka Broker, it can include port eg. "10.38.28.103:9092"
+    - TOPIC: Kafka Topic to read
+
+"""
 from __future__ import print_function
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json, expr, to_json, window, expr, to_timestamp
 from  pyspark.sql.types import StructType, StructField, LongType, StringType, ArrayType
+import os
+
+broker = os.environ['BROKER']
+topic = os.environ['TOPIC']
+
 
 if __name__ == "__main__":
     spark = SparkSession \
@@ -18,8 +30,8 @@ if __name__ == "__main__":
 
     raw = spark.readStream \
         .format("kafka") \
-        .option("kafka.bootstrap.servers", "10.38.28.103:9092") \
-        .option("subscribe", "sliding.curso800") \
+        .option("kafka.bootstrap.servers", broker) \
+        .option("subscribe", topic) \
         .option("startingOffsets", "latest") \
         .load()
 
