@@ -41,7 +41,7 @@ module load openstack
 # Enable bash completion
 source /opt/cesga/openstack/osc.bash_completion
 # First provide your credentials and the project name
-source /opt/cesga/openstackcli/interactive-openrc.sh
+source /opt/cesga/openstack/interactive-openrc.sh
 # Create a keypair
 openstack keypair create --public-key ~/.ssh/id_rsa.pub cursoXXX
 # Create the server
