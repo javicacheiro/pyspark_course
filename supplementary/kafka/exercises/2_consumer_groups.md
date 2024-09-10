@@ -16,15 +16,15 @@ kafka-topics.sh --bootstrap-server $BROKER --topic lab2.cursoXXX --create --part
 Start 3 consumers each in one console:
 - Console 1:
 ```
-kafka-console-consumer.sh --bootstrap-server $BROKER --topic lab2.cursoXXX --group consumer-group-1 --property print.key=true --property key.separator=:
+kafka-console-consumer.sh --bootstrap-server $BROKER --topic lab2.cursoXXX --group consumer-group-1-cursoXXX --property print.key=true --property key.separator=:
 ```
 - Console 2:
 ```
-kafka-console-consumer.sh --bootstrap-server $BROKER --topic lab2.cursoXXX --group consumer-group-1 --property print.key=true --property key.separator=:
+kafka-console-consumer.sh --bootstrap-server $BROKER --topic lab2.cursoXXX --group consumer-group-1-cursoXXX --property print.key=true --property key.separator=:
 ```
 - Console 3:
 ```
-kafka-console-consumer.sh --bootstrap-server $BROKER --topic lab2.cursoXXX --group consumer-group-1 --property print.key=true --property key.separator=:
+kafka-console-consumer.sh --bootstrap-server $BROKER --topic lab2.cursoXXX --group consumer-group-1-cursoXXX --property print.key=true --property key.separator=:
 ```
 
 ## Start the producer
