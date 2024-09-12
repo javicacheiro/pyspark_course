@@ -91,7 +91,7 @@ We go to the maven repository and we have to locate the required connector to us
 - For the legacy DStream API we would look for:
    - [spark-streaming-kafka-0-10: Spark Integration For Kafka 0.10](https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-kafka-0-10)
 
-In the most common case that we want to use structured streaming, we locate the connector corresponding to our spark and scala version, in our case spark 2.4.0 and scala 2.11.
+In the most common case that we want to use structured streaming, we locate the connector corresponding to our spark and scala version, in our case spark 3.4.3 and scala 2.11.
 - https://mvnrepository.com/artifact/org.apache.spark/spark-sql-kafka-0-10_2.12/3.4.3
 
 In this page we look for the groupId, artifactId and version:
