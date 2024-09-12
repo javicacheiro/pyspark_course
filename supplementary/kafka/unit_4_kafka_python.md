@@ -92,6 +92,20 @@ finally:
     consumer.close()
 ```
 
+### A note on `KafkaError._PARTITION_EOF` event
+Recent versions of `confluent_kafka` python module have changed the default of `enable.partition.eof` to `False`, so we would not need to check for this type of event.
+
+If `enable.partition.eof` is set to `True` in the consumer config, then a `KafkaError._PARTITION_EOF` event is emitted when the consumer reaches the end of the partition.
+
+To enable it you would add this option to the consumer's config:
+```
+conf = {'bootstrap.servers': "host1:9092,host2:9092",
+        'group.id': "consumer_group_name",
+        'enable.partition.eof': True}
+
+consumer = Consumer(conf)
+```
+
 ## Synchronous commits
 The simplest and most reliable way to manually commit offsets is by setting the asynchronous parameter to the Consumer.commit() method call.
 ```python

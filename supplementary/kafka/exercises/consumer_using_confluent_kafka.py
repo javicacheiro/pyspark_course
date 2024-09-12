@@ -24,11 +24,13 @@ topic = os.environ['TOPIC']
 conf = {'bootstrap.servers': broker,
         'group.id': os.environ['USER']+'.group',
         'enable.auto.commit': False,
-        'auto.offset.reset': 'earliest'}
+        'auto.offset.reset': 'earliest',
+        # Emit event when the consumer reaches the end of a partition.
+        'enable.partition.eof': True}
 
 consumer = Consumer(conf)
 
-topics = [topic, 'lab1.cursoXXX', 'lab2.cursoXXX']
+topics = [topic]
 
 try:
     consumer.subscribe(topics)
