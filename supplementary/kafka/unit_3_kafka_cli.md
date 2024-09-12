@@ -18,6 +18,9 @@ export BROKER="10.133.29.20:9092"
 
 For convenience we will also add the kafka commands to our path:
 ```bash
+# Option 1: load the kafka module
+module load kafka/3.7.1
+# Option 2: manually add kafka commands to the path
 export PATH="/opt/cesga/kafka/kafka_2.13-3.7.1/bin:$PATH"
 ```
 
